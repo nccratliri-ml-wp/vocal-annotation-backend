@@ -1,0 +1,175 @@
+import argparse
+import json
+from flask import Flask, jsonify, abort, make_response, request, Response, send_file
+from flask_cors import CORS
+
+import numpy as np
+import matplotlib.cm as cm
+import librosa
+from spec_utils import SpecCalConstantQ, SpecCalLogMel
+import soundfile as sf
+
+from PIL import Image
+from skimage.transform import resize
+
+import threading
+import base64
+import io
+import hashlib
+
+# Make Flask application
+app = Flask(__name__)
+CORS(app)
+
+def compute_md5(byte_stream):
+    # Create an MD5 hash object
+    md5_hash = hashlib.md5()
+    # Update the hash object with the byte stream
+    md5_hash.update(byte_stream)
+
+    # Get the hexadecimal representation of the hash
+    return md5_hash.hexdigest()
+
+def bytes_to_base64_string(f_bytes):
+    return base64.b64encode(f_bytes).decode('ASCII')
+
+def base64_string_to_bytes(base64_string):
+    return base64.b64decode(base64_string)
+
+def get_spectrogram( audio, sr, start_time, clip_duration, 
+                     num_spec_columns = 1000, 
+                     min_frequency = None, max_frequency = None, n_bins = 256,
+                     spec_cal_method = "log-mel"
+                   ):
+    
+    hop_length = int( clip_duration * sr / num_spec_columns )
+    if spec_cal_method == "log-mel":
+        spec_cal = SpecCalLogMel( sr = sr, hop_length = hop_length, 
+                                  min_frequency = min_frequency, max_frequency = max_frequency,
+                                  n_bins = n_bins )
+    elif spec_cal_method == "constant-q":
+        spec_cal = SpecCalConstantQ( sr = sr, hop_length = hop_length, 
+                                  min_frequency = min_frequency, max_frequency = max_frequency,
+                                  n_bins = n_bins )
+    else:
+        assert False, "Unsupported spectrogram computation method!"
+    
+    start_time = max( start_time, 0.0 )    
+    audio_clip = audio[ int( start_time * sr ): int( start_time * sr ) + int( clip_duration * sr ) ]
+    audio_clip = np.concatenate( [ audio_clip, np.zeros( int( clip_duration * sr ) - len(audio_clip) ) ], axis = 0 )
+    audio_clip = audio_clip.astype(np.float32)
+        
+    log_mel_spec = spec_cal( audio_clip )
+    
+    ## resize the log_mel_spec
+    log_mel_spec = resize( log_mel_spec, ( n_bins, num_spec_columns, 3 ) )
+    return log_mel_spec
+    
+def register_new_audio( audio, sr, audio_id ): 
+    global audio_dict
+    audio_dict[audio_id] = {
+        "audio":audio,
+        "sr":sr
+    }   
+
+@app.route("/upload", methods=['POST'])
+def upload():
+    global audio_dict, num_spec_columns, n_bins
+    
+    newAudioFile = request.files['newAudioFile']
+    audio, sr = librosa.load(newAudioFile, sr = None)    
+    byte_stream = newAudioFile.read()
+    audio_id = compute_md5(byte_stream)
+    register_new_audio( audio, sr, audio_id )
+    
+    whole_audio_spec = get_spectrogram( audio, sr, 0, len( audio ) / sr, 
+                     num_spec_columns = num_spec_columns, 
+                     n_bins = n_bins,
+                     spec_cal_method = "log-mel"
+                   )
+    
+    spec_3d_arr = np.asarray(whole_audio_spec)
+    spec_3d_arr = np.minimum(spec_3d_arr * 255, 255).astype(np.uint8)
+    im = Image.fromarray(spec_3d_arr)
+    # Create an in-memory binary stream
+    buffer = io.BytesIO()
+    # Save the image to the stream
+    im.save(buffer, format="PNG")
+    # Get the content of the stream and encode it to base64
+    base64_bytes = base64.b64encode(buffer.getvalue())
+    base64_string = base64_bytes.decode()
+    
+    return {"spec":base64_string,
+            "audio_duration": len( audio ) / sr,
+            "audio_id": audio_id
+           }
+
+@app.route("/get-audio-clip-spec", methods=['POST'])
+def get_audio_clip_spec():
+    global audio_dict, num_spec_columns, n_bins
+    
+    request_info = request.json
+    audio_id = request_info["audio_id"]
+    start_time = request_info["start_time"]
+    clip_duration = request_info["clip_duration"]
+    
+    audio = audio_dict[audio_id]["audio"]
+    sr = audio_dict[audio_id]["sr"]
+    
+    min_frequency = request_info.get( "min_frequency", 0 )
+    max_frequency = request_info.get( "max_frequency", sr//2 )
+    spec_cal_method = request_info.get( "spec_cal_method", "log-mel" )
+        
+    audio_clip_spec = get_spectrogram( audio, sr, start_time, clip_duration, 
+                     num_spec_columns = num_spec_columns, 
+                     min_frequency = min_frequency, max_frequency = max_frequency, n_bins = n_bins,
+                     spec_cal_method = spec_cal_method
+                   )
+    
+    spec_3d_arr = np.asarray(audio_clip_spec)
+    spec_3d_arr = np.minimum(spec_3d_arr * 255, 255).astype(np.uint8)
+    im = Image.fromarray(spec_3d_arr)
+    # Create an in-memory binary stream
+    buffer = io.BytesIO()
+    # Save the image to the stream
+    im.save(buffer, format="PNG")
+    # Get the content of the stream and encode it to base64
+    base64_bytes = base64.b64encode(buffer.getvalue())
+    base64_string = base64_bytes.decode()
+    
+    buffer.seek(0)
+    
+    return {"spec":base64_string}
+
+@app.route("/get-audio-clip-wav", methods=['POST'])
+def get_audio_clip_wav():
+    global audio_dict
+    
+    request_info = request.json
+    audio_id = request_info["audio_id"]
+    start_time = request_info["start_time"]
+    clip_duration = request_info["clip_duration"]
+    
+    audio = audio_dict[audio_id]["audio"]
+    sr = audio_dict[audio_id]["sr"]
+    
+    audio_clip = audio[ int( start_time * sr ):int( (start_time + clip_duration) * sr ) ]
+    
+    buffer = io.BytesIO()
+    sf.write(buffer, audio_clip, samplerate=sr, format='WAV')
+    base64_bytes = base64.b64encode(buffer.getvalue())
+    base64_string = base64_bytes.decode()
+    return {"wav":base64_string}
+    
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-flask_port", help="The port of the flask app.", default=8050, type=int)
+    args = parser.parse_args()
+    
+    audio_dict = {}
+    num_spec_columns = 1000
+    n_bins = 300
+    
+    print("Waiting for requests...")
+
+    app.run(host='0.0.0.0', port=args.flask_port, debug = True)
