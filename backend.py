@@ -16,6 +16,7 @@ import threading
 import base64
 import io
 import hashlib
+from scipy import signal
 
 # Make Flask application
 app = Flask(__name__)
@@ -64,6 +65,21 @@ def get_spectrogram( audio, sr, start_time, clip_duration,
     ## resize the log_mel_spec
     log_mel_spec = resize( log_mel_spec, ( n_bins, num_spec_columns, 3 ) )
     return log_mel_spec
+
+def resample_audio( audio, target_length = 500000 ):
+    if len(audio) <= target_length:
+        sampled_audio = audio
+    else:
+        sample_ratio = int(np.ceil(len(audio) / target_length ))
+        sampled_audio = audio[::sample_ratio]
+        
+    if len(sampled_audio) == 0:
+        final_audio = np.zeros( target_length )
+    else:
+        final_audio = signal.resample(sampled_audio, target_length)
+
+    final_audio = final_audio.astype(np.float32)
+    return final_audio
     
 def register_new_audio( audio, sr, audio_id ): 
     global audio_dict
@@ -160,6 +176,25 @@ def get_audio_clip_wav():
     base64_bytes = base64.b64encode(buffer.getvalue())
     base64_string = base64_bytes.decode()
     return {"wav":base64_string}
+
+
+@app.route("/get-audio-clip-for-visualization", methods=['POST'])
+def get_audio_clip_for_visualization():
+    global audio_dict
+    
+    request_info = request.json
+    audio_id = request_info["audio_id"]
+    start_time = request_info["start_time"]
+    clip_duration = request_info["clip_duration"]
+    target_length = request_info.get("target_length", 100000)
+    
+    audio = audio_dict[audio_id]["audio"]
+    sr = audio_dict[audio_id]["sr"]
+    
+    audio_clip = audio[ int( start_time * sr ):int( (start_time + clip_duration) * sr ) ]
+    audio_clip = resample_audio( audio_clip, target_length ).tolist()
+
+    return jsonify({"wav_array":audio_clip}), 201
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
