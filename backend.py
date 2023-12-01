@@ -40,18 +40,20 @@ def base64_string_to_bytes(base64_string):
 def get_spectrogram( audio, sr, start_time, clip_duration, 
                      num_spec_columns = 1000, 
                      min_frequency = None, max_frequency = None, n_bins = 256,
-                     spec_cal_method = "log-mel"
+                     spec_cal_method = "log-mel",
+                     n_fft = None,
+                     bins_per_octave = None
                    ):
     
     hop_length = int( clip_duration * sr / num_spec_columns )
     if spec_cal_method == "log-mel":
         spec_cal = SpecCalLogMel( sr = sr, hop_length = hop_length, 
                                   min_frequency = min_frequency, max_frequency = max_frequency,
-                                  n_bins = n_bins )
+                                  n_bins = n_bins, n_fft = n_fft )
     elif spec_cal_method == "constant-q":
         spec_cal = SpecCalConstantQ( sr = sr, hop_length = hop_length, 
                                   min_frequency = min_frequency, max_frequency = max_frequency,
-                                  n_bins = n_bins )
+                                  n_bins = n_bins, bins_per_octave = bins_per_octave )
     else:
         assert False, "Unsupported spectrogram computation method!"
     
@@ -125,6 +127,9 @@ def get_audio_clip_spec():
     global audio_dict, num_spec_columns, n_bins
     
     request_info = request.json
+
+    print(request_info.keys())
+
     audio_id = request_info["audio_id"]
     start_time = request_info["start_time"]
     clip_duration = request_info["clip_duration"]
@@ -135,11 +140,27 @@ def get_audio_clip_spec():
     min_frequency = request_info.get( "min_frequency", 0 )
     max_frequency = request_info.get( "max_frequency", sr//2 )
     spec_cal_method = request_info.get( "spec_cal_method", "log-mel" )
-        
+    
+    try:
+        n_fft = int(request_info.get("nfft", None))
+    except:
+        n_fft = None
+    try:
+        bins_per_octave = int(request_info.get("bins_per_octave", None))
+    except:
+        bins_per_octave = None
+
+    if spec_cal_method == "log-mel":
+        print("Computing LogMel, n_fft =", n_fft)
+    elif spec_cal_method == "constant-q":
+        print("Computing Constant-Q, bins_per_octave=", bins_per_octave)
+
     audio_clip_spec = get_spectrogram( audio, sr, start_time, clip_duration, 
                      num_spec_columns = num_spec_columns, 
                      min_frequency = min_frequency, max_frequency = max_frequency, n_bins = n_bins,
-                     spec_cal_method = spec_cal_method
+                     spec_cal_method = spec_cal_method,
+                     n_fft = n_fft,
+                     bins_per_octave = bins_per_octave
                    )
     
     spec_3d_arr = np.asarray(audio_clip_spec)
