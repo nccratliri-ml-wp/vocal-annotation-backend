@@ -142,7 +142,7 @@ def get_audio_clip_spec():
     spec_cal_method = request_info.get( "spec_cal_method", "log-mel" )
     
     try:
-        n_fft = int(request_info.get("nfft", None))
+        n_fft = int(request_info.get("n_fft", None))
     except:
         n_fft = None
     try:
