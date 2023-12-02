@@ -24,12 +24,12 @@ class SpecCalConstantQ:
         self.n_bins = n_bins
         
         ## derived fmax = fmin * (2**( n_bins/bins_per_octave ) ), we need to incrementally increase bins_per_octave and make sure derived fmax do not exceed Nyquist sampling rate
-        # Initialize bins_per_octave to 1
-        bins_per_octave = int(np.ceil(self.n_bins / np.log2(sys.float_info.max / self.min_frequency )))   ## this may be reffered as the Q value?
-        # Incrementally increase bins_per_octave until the derived maximum frequency is below the Nyquist frequency
-        while self.min_frequency * (2**(n_bins/bins_per_octave)) > self.max_frequency:
-            bins_per_octave += 1
-        self.min_bins_per_octave = bins_per_octave
+        # Initialize min_bins_per_octave to 1
+        min_bins_per_octave = int(np.ceil(self.n_bins / np.log2(sys.float_info.max / self.min_frequency )))   ## this may be reffered as the Q value?
+        # Incrementally increase min_bins_per_octave until the derived maximum frequency is below the Nyquist frequency
+        while self.min_frequency * (2**(n_bins/min_bins_per_octave)) > self.max_frequency:
+            min_bins_per_octave += 1
+        self.min_bins_per_octave = min_bins_per_octave
         
         if bins_per_octave is None:
             self.bins_per_octave = self.min_bins_per_octave

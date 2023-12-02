@@ -10,27 +10,31 @@ from PIL import Image
 import sys
 
 class SpecCalConstantQ:
-    def __init__(self, sr, hop_length, min_frequency = None, max_frequency = None, n_bins = 256, color_map = "inferno" ):
+    def __init__(self, sr, hop_length, min_frequency = None, max_frequency = None, n_bins = 256, 
+                 bins_per_octave = None,
+                 color_map = "inferno", **kwargs ):
         self.sr = sr
         self.hop_length = hop_length
-        self.min_frequency = 200 if min_frequency is None else min_frequency
-        if self.min_frequency == 0:
-            self.min_frequency = 200
+        self.min_frequency = 100 if min_frequency is None else min_frequency
+        if self.min_frequency <= 0:
+            self.min_frequency = 100
         self.max_frequency = int(sr/2) if max_frequency is None else max_frequency
         if self.max_frequency > int(sr/2):
             self.max_frequency = int(sr/2)
         self.n_bins = n_bins
         
         ## derived fmax = fmin * (2**( n_bins/bins_per_octave ) ), we need to incrementally increase bins_per_octave and make sure derived fmax do not exceed Nyquist sampling rate
-        # Initialize bins_per_octave to 1
-        self.min_bins_per_octave = int(np.ceil(self.n_bins / np.log2(sys.float_info.max / self.min_frequency )))   ## this may be reffered as the Q value?
-        bins_per_octave = self.min_bins_per_octave
-        # Incrementally increase bins_per_octave until the derived maximum frequency is below the Nyquist frequency
-        while self.min_frequency * (2**(n_bins/bins_per_octave)) > self.max_frequency:
-            bins_per_octave += 1
-        self.max_bins_per_octave = bins_per_octave
-            
-        self.bins_per_octave = self.max_bins_per_octave
+        # Initialize min_bins_per_octave to 1
+        min_bins_per_octave = int(np.ceil(self.n_bins / np.log2(sys.float_info.max / self.min_frequency )))   ## this may be reffered as the Q value?
+        # Incrementally increase min_bins_per_octave until the derived maximum frequency is below the Nyquist frequency
+        while self.min_frequency * (2**(n_bins/min_bins_per_octave)) > self.max_frequency:
+            min_bins_per_octave += 1
+        self.min_bins_per_octave = min_bins_per_octave
+        
+        if bins_per_octave is None:
+            self.bins_per_octave = self.min_bins_per_octave
+        else:
+            self.bins_per_octave = max( self.min_bins_per_octave, bins_per_octave )
         
         self.cmap = matplotlib.colormaps.get_cmap(color_map)
 
@@ -71,7 +75,9 @@ class SpecCalConstantQ:
         return spec
     
 class SpecCalLogMel:
-    def __init__(self, sr, hop_length, min_frequency = None, max_frequency = None, n_bins = 256, color_map = "inferno" ):
+    def __init__(self, sr, hop_length, min_frequency = None, max_frequency = None, n_bins = 256,
+                 n_fft = None,
+                 color_map = "inferno", **kwargs ):
         self.sr = sr
         self.hop_length = hop_length
         self.min_frequency = 0 if min_frequency is None else min_frequency
@@ -81,16 +87,19 @@ class SpecCalLogMel:
         self.n_bins = n_bins        
         self.cmap = matplotlib.colormaps.get_cmap(color_map)
         
-        if sr <= 32000:
-            n_fft = 512
-        elif sr <= 80000:
-            n_fft = 1024
-        elif sr <= 150000:
-            n_fft = 2048
-        elif sr <= 300000:
-            n_fft = 4096
+        if n_fft is None:
+            if sr <= 32000:
+                n_fft = 512
+            elif sr <= 80000:
+                n_fft = 1024
+            elif sr <= 150000:
+                n_fft = 2048
+            elif sr <= 300000:
+                n_fft = 4096
+            else:
+                n_fft = 8192
         else:
-            n_fft = 8192
+            n_fft = max(5, n_fft)
         self.n_fft = n_fft
         self.freq_upsampling_ratio = 8
 
