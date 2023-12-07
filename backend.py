@@ -166,6 +166,7 @@ def get_audio_clip_spec():
     spec_3d_arr = np.asarray(audio_clip_spec)
     spec_3d_arr = np.minimum(spec_3d_arr * 255, 255).astype(np.uint8)
     im = Image.fromarray(spec_3d_arr)
+
     # Create an in-memory binary stream
     buffer = io.BytesIO()
     # Save the image to the stream
@@ -190,7 +191,9 @@ def get_audio_clip_wav():
     audio = audio_dict[audio_id]["audio"]
     sr = audio_dict[audio_id]["sr"]
     
-    audio_clip = audio[ int( start_time * sr ):int( (start_time + clip_duration) * sr ) ]
+    audio_clip = audio[ int( start_time * sr ): int( start_time * sr ) + int(clip_duration * sr) ] # int( (start_time + clip_duration) * sr ) ]
+    ## always pad the audio to the specified length of duration
+    audio_clip = np.concatenate( [ audio_clip, np.zeros( int(clip_duration * sr) - len(audio_clip) ) ], axis = 0 ).astype(np.float32)
     
     buffer = io.BytesIO()
     sf.write(buffer, audio_clip, samplerate=sr, format='WAV')
