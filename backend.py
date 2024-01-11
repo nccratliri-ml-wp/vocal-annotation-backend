@@ -18,6 +18,8 @@ import io
 import hashlib
 from scipy import signal
 
+import random
+
 # Make Flask application
 app = Flask(__name__)
 CORS(app)
@@ -97,7 +99,9 @@ def upload():
     newAudioFile = request.files['newAudioFile']
     audio, sr = librosa.load(newAudioFile, sr = None)    
     byte_stream = newAudioFile.read()
-    audio_id = compute_md5(byte_stream)
+    #audio_id = compute_md5(byte_stream)
+    audio_id = str(random.randint(1, 10000))
+    print(audio_id)
     register_new_audio( audio, sr, audio_id )
     
     whole_audio_spec = get_spectrogram( audio, sr, 0, len( audio ) / sr, 
