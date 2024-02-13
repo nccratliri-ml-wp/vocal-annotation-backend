@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 from PIL import Image
 import sys
+from librosa.core.convert import cqt_frequencies, mel_frequencies
 
 class SpecCalConstantQ:
     def __init__(self, sr, hop_length, min_frequency = None, max_frequency = None, n_bins = 256, 
@@ -37,6 +38,7 @@ class SpecCalConstantQ:
             self.bins_per_octave = max( self.min_bins_per_octave, bins_per_octave )
         
         self.cmap = matplotlib.colormaps.get_cmap(color_map)
+        self.freqs = cqt_frequencies( self.n_bins, fmin = self.min_frequency, bins_per_octave = self.bins_per_octave)
 
     def sigmoid(self, x, offset, low, high, sharpness):
         remapped = (x - offset) * sharpness
@@ -102,6 +104,8 @@ class SpecCalLogMel:
             n_fft = max(5, n_fft)
         self.n_fft = n_fft
         self.freq_upsampling_ratio = 8
+
+        self.freqs = mel_frequencies( self.n_bins, fmin = self.min_frequency, fmax = self.max_frequency )
 
     def sigmoid(self, x, offset, low, high, sharpness):
         remapped = (x - offset) * sharpness

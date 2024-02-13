@@ -19,6 +19,7 @@ import hashlib
 from scipy import signal
 
 import random
+from uuid import uuid4
 
 # Make Flask application
 app = Flask(__name__)
@@ -68,7 +69,7 @@ def get_spectrogram( audio, sr, start_time, clip_duration,
     
     ## resize the log_mel_spec
     log_mel_spec = resize( log_mel_spec, ( n_bins, num_spec_columns, 3 ) )
-    return log_mel_spec
+    return log_mel_spec, spec_cal.freqs
 
 def resample_audio( audio, target_length = 500000 ):
     if len(audio) <= target_length:
@@ -89,7 +90,9 @@ def register_new_audio( audio, sr, audio_id ):
     global audio_dict
     audio_dict[audio_id] = {
         "audio":audio,
-        "sr":sr
+        "sr":sr,
+        "percentile_99":np.percentile(audio, 99),
+        "percentile_1":np.percentile(audio, 1)
     }   
 
 @app.route("/upload", methods=['POST'])
@@ -100,11 +103,12 @@ def upload():
     audio, sr = librosa.load(newAudioFile, sr = None)    
     byte_stream = newAudioFile.read()
     #audio_id = compute_md5(byte_stream)
-    audio_id = str(random.randint(1, 10000))
+    # audio_id = str(random.randint(1, 10000))
+    audio_id = str( uuid4() )
     print(audio_id)
     register_new_audio( audio, sr, audio_id )
     
-    whole_audio_spec = get_spectrogram( audio, sr, 0, len( audio ) / sr, 
+    whole_audio_spec, freqs = get_spectrogram( audio, sr, 0, len( audio ) / sr, 
                      num_spec_columns = num_spec_columns, 
                      n_bins = n_bins,
                      spec_cal_method = "log-mel"
@@ -122,6 +126,7 @@ def upload():
     base64_string = base64_bytes.decode()
     
     return {"spec":base64_string,
+            "freqs":freqs.tolist(),
             "audio_duration": len( audio ) / sr,
             "audio_id": audio_id
            }
@@ -159,7 +164,7 @@ def get_audio_clip_spec():
     elif spec_cal_method == "constant-q":
         print("Computing Constant-Q, bins_per_octave=", bins_per_octave)
 
-    audio_clip_spec = get_spectrogram( audio, sr, start_time, clip_duration, 
+    audio_clip_spec, freqs = get_spectrogram( audio, sr, start_time, clip_duration, 
                      num_spec_columns = num_spec_columns, 
                      min_frequency = min_frequency, max_frequency = max_frequency, n_bins = n_bins,
                      spec_cal_method = spec_cal_method,
@@ -181,7 +186,8 @@ def get_audio_clip_spec():
     
     buffer.seek(0)
     
-    return {"spec":base64_string}
+    return {"spec":base64_string, 
+            "freqs": freqs.tolist()}
 
 @app.route("/get-audio-clip-wav", methods=['POST'])
 def get_audio_clip_wav():
@@ -218,11 +224,14 @@ def get_audio_clip_for_visualization():
     
     audio = audio_dict[audio_id]["audio"]
     sr = audio_dict[audio_id]["sr"]
+    percentile_99 = audio_dict[audio_id]["percentile_99"]
+    percentile_1 = audio_dict[audio_id]["percentile_1"]
     
     audio_clip = audio[ int( start_time * sr ):int( (start_time + clip_duration) * sr ) ]
-    audio_clip = resample_audio( audio_clip, target_length ).tolist()
+    audio_clip = resample_audio( audio_clip, target_length )
 
-    return jsonify({"wav_array":audio_clip}), 201
+    audio_clip = np.clip( audio_clip, a_min = percentile_1, a_max =  percentile_99 )
+    return jsonify({"wav_array":audio_clip.tolist()}), 201
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
