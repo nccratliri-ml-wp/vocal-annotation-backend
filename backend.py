@@ -91,8 +91,8 @@ def register_new_audio( audio, sr, audio_id ):
     audio_dict[audio_id] = {
         "audio":audio,
         "sr":sr,
-        "percentile_99":np.percentile(audio, 99),
-        "percentile_1":np.percentile(audio, 1)
+        "percentile_up":np.percentile(audio, 99.9),
+        "percentile_down":np.percentile(audio, 0.1)
     }   
 
 @app.route("/upload", methods=['POST'])
@@ -224,13 +224,13 @@ def get_audio_clip_for_visualization():
     
     audio = audio_dict[audio_id]["audio"]
     sr = audio_dict[audio_id]["sr"]
-    percentile_99 = audio_dict[audio_id]["percentile_99"]
-    percentile_1 = audio_dict[audio_id]["percentile_1"]
+    percentile_up = audio_dict[audio_id]["percentile_up"]
+    percentile_down = audio_dict[audio_id]["percentile_down"]
     
     audio_clip = audio[ int( start_time * sr ):int( (start_time + clip_duration) * sr ) ]
     audio_clip = resample_audio( audio_clip, target_length )
 
-    audio_clip = np.clip( audio_clip, a_min = percentile_1, a_max =  percentile_99 )
+    audio_clip = np.clip( audio_clip, a_min = percentile_down, a_max =  percentile_up )
     return jsonify({"wav_array":audio_clip.tolist()}), 201
     
 if __name__ == '__main__':
