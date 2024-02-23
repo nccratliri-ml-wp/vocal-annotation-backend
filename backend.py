@@ -16,12 +16,29 @@ from scipy import signal
 import random
 from uuid import uuid4
 
+import requests
+from io import BytesIO
+from pydub import AudioSegment
+
 from spec_utils import SpecCalConstantQ, SpecCalLogMel
 from segmentation_utils import call_segment_service
 
 # Make Flask application
 app = Flask(__name__)
 CORS(app)
+
+def load_audio_from_url(audio_url):
+    response = requests.get(audio_url)
+    response.raise_for_status()
+    audio_file = BytesIO(response.content)
+    audio_data = AudioSegment.from_file(audio_file)
+    wav_bytes = BytesIO()
+    ## always convert to wav, which can be safely loaded via librosa
+    audio_data.export(wav_bytes, format="wav")
+    wav_bytes.seek(0)  # Reset the pointer of the BytesIO object
+    # Load the WAV bytes with librosa
+    audio, sr = librosa.load(wav_bytes, sr=None)  # 'sr=None' to preserve the original sampling rate
+    return audio, sr
 
 def compute_md5(byte_stream):
     # Create an MD5 hash object
@@ -119,6 +136,40 @@ def upload():
     buffer = io.BytesIO()
     # Save the image to the stream
     im.save(buffer, format="PNG")
+    # Get the content of the stream and encode it to base64
+    base64_bytes = base64.b64encode(buffer.getvalue())
+    base64_string = base64_bytes.decode()
+    
+    return {"spec":base64_string,
+            "freqs":freqs.tolist(),
+            "audio_duration": len( audio ) / sr,
+            "audio_id": audio_id
+           }
+
+@app.route("/upload-by-url", methods=['POST'])
+def upload_by_url():
+    global audio_dict, num_spec_columns, n_bins
+    request_info = request.json
+    audio_url = request_info['audio_url']
+
+    audio, sr = load_audio_from_url(audio_url)
+    audio_id = str( uuid4() )
+    print(audio_id)
+    register_new_audio( audio, sr, audio_id )
+    
+    whole_audio_spec, freqs = get_spectrogram( audio, sr, 0, len( audio ) / sr, 
+                     num_spec_columns = num_spec_columns, 
+                     n_bins = n_bins,
+                     spec_cal_method = "log-mel"
+                   )
+    
+    spec_3d_arr = np.asarray(whole_audio_spec)
+    spec_3d_arr = np.minimum(spec_3d_arr * 255, 255).astype(np.uint8)
+    im = Image.fromarray(spec_3d_arr)
+    # Create an in-memory binary stream
+    buffer = io.BytesIO()
+    # Save the image to the stream
+    im.save(buffer, format="JPEG")
     # Get the content of the stream and encode it to base64
     base64_bytes = base64.b64encode(buffer.getvalue())
     base64_string = base64_bytes.decode()
