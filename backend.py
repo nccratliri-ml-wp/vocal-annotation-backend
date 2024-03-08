@@ -245,6 +245,8 @@ def get_audio_clip_spec():
     
     min_frequency = request_info.get( "min_frequency", 0 )
     max_frequency = request_info.get( "max_frequency", sr//2 )
+    max_frequency = min( max_frequency, sr//2 )
+    
     spec_cal_method = request_info.get( "spec_cal_method", "log-mel" )
     
     try:
