@@ -31,14 +31,13 @@ def load_audio_from_url(audio_url):
     response = requests.get(audio_url)
     response.raise_for_status()
     audio_file = BytesIO(response.content)
-
     audio_data = AudioSegment.from_file(audio_file)
     wav_bytes = BytesIO()
     ## always convert to wav, which can be safely loaded via librosa
     audio_data.export(wav_bytes, format="wav")
     wav_bytes.seek(0)  # Reset the pointer of the BytesIO object
     # Load the WAV bytes with librosa
-    audio, sr = librosa.load(wav_bytes, sr=None, mono=False)  # 'sr=None' to preserve the original sampling rate
+    audio, sr = librosa.load(wav_bytes, sr=None)  # 'sr=None' to preserve the original sampling rate
     return audio, sr
 
 def compute_md5(byte_stream):
@@ -87,49 +86,17 @@ def get_spectrogram( audio, sr, start_time, clip_duration,
     log_mel_spec = resize( log_mel_spec, ( n_bins, num_spec_columns, 3 ) )
     return log_mel_spec, spec_cal.freqs
 
-def min_max_downsample(array, rough_target_length):
-    
-    half_target_length = rough_target_length // 2
-    downsample_factor = int(np.round( len(array) / half_target_length ))
-    
-    # Calculate the size of the downsampled array
-    downsampled_length = len(array) // downsample_factor
-    remainder = len(array) % downsample_factor
-
-    # Handle case where array size is not a multiple of downsample_factor
-    if remainder != 0:
-        # Pad array to make it fit exactly into the downsample factor
-        padded_size = downsampled_length * downsample_factor + downsample_factor
-        padded_array = np.pad(array, (0, padded_size - array.size), 'constant', constant_values=np.nan)
-    else:
-        padded_array = array
-
-    # Reshape the array to group by downsample factor
-    reshaped_array = padded_array.reshape(-1, downsample_factor)
-
-    # Calculate min and max for each group
-    mins = np.nanmin(reshaped_array, axis=1)
-    maxs = np.nanmax(reshaped_array, axis=1)
-
-    # Combine mins and maxs into a single array
-    downsampled_array = np.stack((mins, maxs), axis=-1)
-    # If there was a remainder, trim the last element (as it was padded)
-    if remainder != 0:
-        downsampled_array = downsampled_array[:-1]
-    
-    downsampled_array = downsampled_array.flatten()
-    return downsampled_array
-
-def resample_audio( audio, target_length = 100000 ):
+def resample_audio( audio, target_length = 500000 ):
     if len(audio) <= target_length:
         sampled_audio = audio
     else:
-        sampled_audio = min_max_downsample(audio, 10000)
+        sample_ratio = int(np.ceil(len(audio) / target_length ))
+        sampled_audio = audio[::sample_ratio]
         
     if len(sampled_audio) == 0:
         final_audio = np.zeros( target_length )
     else:
-        final_audio = sampled_audio
+        final_audio = signal.resample(sampled_audio, target_length)
 
     final_audio = final_audio.astype(np.float32)
     return final_audio
@@ -139,8 +106,8 @@ def register_new_audio( audio, sr, audio_id ):
     audio_dict[audio_id] = {
         "audio":audio,
         "sr":sr,
-        "percentile_up":np.percentile(audio, 99.99),
-        "percentile_down":np.percentile(audio, 0.01)
+        "percentile_up":np.percentile(audio, 99.9),
+        "percentile_down":np.percentile(audio, 0.1)
     }   
 
 @app.route("/upload", methods=['POST'])
@@ -148,42 +115,36 @@ def upload():
     global audio_dict, num_spec_columns, n_bins
     
     newAudioFile = request.files['newAudioFile']
-    audio_multi_channels, sr = librosa.load(newAudioFile, sr = None, mono = False )   
-    if len( audio_multi_channels.shape ) == 1:
-        audio_multi_channels = audio_multi_channels[ np.newaxis,: ]
+    audio, sr = librosa.load(newAudioFile, sr = None)    
+    byte_stream = newAudioFile.read()
+    #audio_id = compute_md5(byte_stream)
+    # audio_id = str(random.randint(1, 10000))
+    audio_id = str( uuid4() )
+    print(audio_id)
+    register_new_audio( audio, sr, audio_id )
     
-    spec_all_channels = []
-    for pos in range( audio_multi_channels.shape[0] ):
-        audio = audio_multi_channels[pos]
-
-        audio_id = str( uuid4() )
-        print(audio_id)
-        register_new_audio( audio, sr, audio_id )
-        
-        whole_audio_spec, freqs = get_spectrogram( audio, sr, 0, len( audio ) / sr, 
-                        num_spec_columns = num_spec_columns, 
-                        n_bins = n_bins,
-                        spec_cal_method = "log-mel"
-                    )
-        
-        spec_3d_arr = np.asarray(whole_audio_spec)
-        spec_3d_arr = np.minimum(spec_3d_arr * 255, 255).astype(np.uint8)
-        im = Image.fromarray(spec_3d_arr)
-        # Create an in-memory binary stream
-        buffer = io.BytesIO()
-        # Save the image to the stream
-        im.save(buffer, format="JPEG")
-        # Get the content of the stream and encode it to base64
-        base64_bytes = base64.b64encode(buffer.getvalue())
-        base64_string = base64_bytes.decode()
-        
-        spec_all_channels.append( {"spec":base64_string,
-                "freqs":freqs.tolist(),
-                "audio_duration": len( audio ) / sr,
-                "audio_id": audio_id
-            } )
-        
-    return jsonify(spec_all_channels), 201
+    whole_audio_spec, freqs = get_spectrogram( audio, sr, 0, len( audio ) / sr, 
+                     num_spec_columns = num_spec_columns, 
+                     n_bins = n_bins,
+                     spec_cal_method = "log-mel"
+                   )
+    
+    spec_3d_arr = np.asarray(whole_audio_spec)
+    spec_3d_arr = np.minimum(spec_3d_arr * 255, 255).astype(np.uint8)
+    im = Image.fromarray(spec_3d_arr)
+    # Create an in-memory binary stream
+    buffer = io.BytesIO()
+    # Save the image to the stream
+    im.save(buffer, format="PNG")
+    # Get the content of the stream and encode it to base64
+    base64_bytes = base64.b64encode(buffer.getvalue())
+    base64_string = base64_bytes.decode()
+    
+    return {"spec":base64_string,
+            "freqs":freqs.tolist(),
+            "audio_duration": len( audio ) / sr,
+            "audio_id": audio_id
+           }
 
 @app.route("/upload-by-url", methods=['POST'])
 def upload_by_url():
@@ -191,43 +152,34 @@ def upload_by_url():
     request_info = request.json
     audio_url = request_info['audio_url']
 
-    audio_multi_channels, sr = load_audio_from_url(audio_url)
-    if len( audio_multi_channels.shape ) == 1:
-        audio_multi_channels = audio_multi_channels[ np.newaxis,: ]
+    audio, sr = load_audio_from_url(audio_url)
+    audio_id = str( uuid4() )
+    print(audio_id)
+    register_new_audio( audio, sr, audio_id )
+    
+    whole_audio_spec, freqs = get_spectrogram( audio, sr, 0, len( audio ) / sr, 
+                     num_spec_columns = num_spec_columns, 
+                     n_bins = n_bins,
+                     spec_cal_method = "log-mel"
+                   )
+    
+    spec_3d_arr = np.asarray(whole_audio_spec)
+    spec_3d_arr = np.minimum(spec_3d_arr * 255, 255).astype(np.uint8)
+    im = Image.fromarray(spec_3d_arr)
+    # Create an in-memory binary stream
+    buffer = io.BytesIO()
+    # Save the image to the stream
+    im.save(buffer, format="JPEG")
+    # Get the content of the stream and encode it to base64
+    base64_bytes = base64.b64encode(buffer.getvalue())
+    base64_string = base64_bytes.decode()
+    
+    return {"spec":base64_string,
+            "freqs":freqs.tolist(),
+            "audio_duration": len( audio ) / sr,
+            "audio_id": audio_id
+           }
 
-    spec_all_channels = []
-    for pos in range( audio_multi_channels.shape[0] ):
-        audio = audio_multi_channels[pos]
-    
-        audio_id = str( uuid4() )
-        print(audio_id)
-        register_new_audio( audio, sr, audio_id )
-        
-        whole_audio_spec, freqs = get_spectrogram( audio, sr, 0, len( audio ) / sr, 
-                        num_spec_columns = num_spec_columns, 
-                        n_bins = n_bins,
-                        spec_cal_method = "log-mel"
-                    )
-        
-        spec_3d_arr = np.asarray(whole_audio_spec)
-        spec_3d_arr = np.minimum(spec_3d_arr * 255, 255).astype(np.uint8)
-        im = Image.fromarray(spec_3d_arr)
-        # Create an in-memory binary stream
-        buffer = io.BytesIO()
-        # Save the image to the stream
-        im.save(buffer, format="JPEG")
-        # Get the content of the stream and encode it to base64
-        base64_bytes = base64.b64encode(buffer.getvalue())
-        base64_string = base64_bytes.decode()
-        
-        spec_all_channels.append( {"spec":base64_string,
-                "freqs":freqs.tolist(),
-                "audio_duration": len( audio ) / sr,
-                "audio_id": audio_id
-            } )
-        
-    return jsonify(spec_all_channels), 201
-    
 @app.route("/get-audio-clip-spec", methods=['POST'])
 def get_audio_clip_spec():
     global audio_dict, num_spec_columns, n_bins
@@ -245,8 +197,6 @@ def get_audio_clip_spec():
     
     min_frequency = request_info.get( "min_frequency", 0 )
     max_frequency = request_info.get( "max_frequency", sr//2 )
-    max_frequency = min( max_frequency, sr//2 )
-    
     spec_cal_method = request_info.get( "spec_cal_method", "log-mel" )
     
     try:
@@ -278,7 +228,7 @@ def get_audio_clip_spec():
     # Create an in-memory binary stream
     buffer = io.BytesIO()
     # Save the image to the stream
-    im.save(buffer, format="JPEG")
+    im.save(buffer, format="PNG")
     # Get the content of the stream and encode it to base64
     base64_bytes = base64.b64encode(buffer.getvalue())
     base64_string = base64_bytes.decode()

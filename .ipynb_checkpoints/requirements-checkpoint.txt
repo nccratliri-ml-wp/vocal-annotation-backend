@@ -1,9 +1,0 @@
-jupyterlab
-flask
-flask-cors
-numpy
-librosa
-matplotlib
-scikit-image
-pydub
-pandas
