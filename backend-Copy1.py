@@ -27,7 +27,7 @@ from segmentation_utils import call_segment_service
 app = Flask(__name__)
 CORS(app)
 
-def load_audio_from_url(audio_url, sr = None):
+def load_audio_from_url(audio_url):
     response = requests.get(audio_url)
     response.raise_for_status()
     audio_file = BytesIO(response.content)
@@ -38,7 +38,7 @@ def load_audio_from_url(audio_url, sr = None):
     audio_data.export(wav_bytes, format="wav")
     wav_bytes.seek(0)  # Reset the pointer of the BytesIO object
     # Load the WAV bytes with librosa
-    audio, sr = librosa.load(wav_bytes, sr = sr, mono=False)  # 'sr=None' to preserve the original sampling rate
+    audio, sr = librosa.load(wav_bytes, sr=None, mono=False)  # 'sr=None' to preserve the original sampling rate
     return audio, sr
 
 def compute_md5(byte_stream):
@@ -56,19 +56,15 @@ def bytes_to_base64_string(f_bytes):
 def base64_string_to_bytes(base64_string):
     return base64.b64decode(base64_string)
 
-def get_spectrogram( audio, sr, start_time, hop_length, 
-                     num_spec_columns, 
+def get_spectrogram( audio, sr, start_time, clip_duration, 
+                     num_spec_columns = 1000, 
                      min_frequency = None, max_frequency = None, n_bins = 256,
-                     spec_cal_method = None,
+                     spec_cal_method = "log-mel",
                      n_fft = None,
                      bins_per_octave = None
                    ):
-    if spec_cal_method is None:
-        spec_cal_method = "log-mel"
     
-    hop_length = int(hop_length)
-    num_samples = hop_length * num_spec_columns
-
+    hop_length = int( clip_duration * sr / num_spec_columns )
     if spec_cal_method == "log-mel":
         spec_cal = SpecCalLogMel( sr = sr, hop_length = hop_length, 
                                   min_frequency = min_frequency, max_frequency = max_frequency,
@@ -81,27 +77,15 @@ def get_spectrogram( audio, sr, start_time, hop_length,
         assert False, "Unsupported spectrogram computation method!"
     
     start_time = max( start_time, 0.0 )    
-    audio_clip = audio[ int( start_time * sr ): int( start_time * sr ) + num_samples ]
-    audio_clip = np.concatenate( [ audio_clip, np.zeros( num_samples - len(audio_clip) ) ], axis = 0 )
+    audio_clip = audio[ int( start_time * sr ): int( start_time * sr ) + int( clip_duration * sr ) ]
+    audio_clip = np.concatenate( [ audio_clip, np.zeros( int( clip_duration * sr ) - len(audio_clip) ) ], axis = 0 )
     audio_clip = audio_clip.astype(np.float32)
         
     log_mel_spec = spec_cal( audio_clip )
     
     ## resize the log_mel_spec
     log_mel_spec = resize( log_mel_spec, ( n_bins, num_spec_columns, 3 ) )
-
-    config = {
-        "spec_cal_method":spec_cal_method,
-        "n_fft": spec_cal.n_fft if spec_cal_method in [ "log-mel" ] else n_fft,
-        "bins_per_octave": spec_cal.bins_per_octave if spec_cal_method in [ "constant-q" ] else bins_per_octave,
-        "hop_length": hop_length,
-        "num_spec_columns":num_spec_columns,
-        "sampling_rate":sr,
-        "min_frequency":spec_cal.min_frequency,
-        "max_frequency":spec_cal.max_frequency
-    }
-    
-    return log_mel_spec, spec_cal.freqs, config
+    return log_mel_spec, spec_cal.freqs
 
 def min_max_downsample(array, rough_target_length):
     
@@ -161,34 +145,12 @@ def register_new_audio( audio, sr, audio_id ):
 
 @app.route("/upload", methods=['POST'])
 def upload():
-    global audio_dict, n_bins
+    global audio_dict, num_spec_columns, n_bins
     
     newAudioFile = request.files['newAudioFile']
-    spec_cal_method = request.form.get('spec_cal_method', type=str, default=None)
-    n_fft = request.form.get('n_fft', type=int, default=None)
-    bins_per_octave = request.form.get('bins_per_octave', type=int, default=None)
-    hop_length = request.form.get('hop_length', type=int, default=None)
-    num_spec_columns = request.form.get('num_spec_columns', type=int, default=None)
-    sr = request.form.get('sampling_rate', type=int, default=None)
-    min_frequency = request.form.get('min_frequency', type=int, default=None)
-    max_frequency = request.form.get('max_frequency', type=int, default=None)
-
-    if num_spec_columns is None:
-        num_spec_columns = 1000
-
-    audio_multi_channels, sr = librosa.load(newAudioFile, sr = sr, mono = False )  
-
-    if max_frequency is None:
-        max_frequency = sr // 2
-    else:
-        max_frequency = min( max_frequency, sr//2 )
-        
+    audio_multi_channels, sr = librosa.load(newAudioFile, sr = None, mono = False )   
     if len( audio_multi_channels.shape ) == 1:
         audio_multi_channels = audio_multi_channels[ np.newaxis,: ]
-
-    ## multiple channels of the same audio should have the same length
-    if hop_length is None:
-        hop_length = audio_multi_channels.shape[1] // num_spec_columns
     
     spec_all_channels = []
     for pos in range( audio_multi_channels.shape[0] ):
@@ -198,15 +160,11 @@ def upload():
         print(audio_id)
         register_new_audio( audio, sr, audio_id )
         
-        whole_audio_spec, freqs, config = get_spectrogram( audio, sr, 0, hop_length, 
-                                                          num_spec_columns = num_spec_columns, 
-                                                          min_frequency = min_frequency, 
-                                                          max_frequency = max_frequency,
-                                                          n_bins = n_bins,
-                                                          spec_cal_method = spec_cal_method,
-                                                          n_fft = n_fft,
-                                                          bins_per_octave = bins_per_octave
-                                                        )
+        whole_audio_spec, freqs = get_spectrogram( audio, sr, 0, len( audio ) / sr, 
+                        num_spec_columns = num_spec_columns, 
+                        n_bins = n_bins,
+                        spec_cal_method = "log-mel"
+                    )
         
         spec_3d_arr = np.asarray(whole_audio_spec)
         spec_3d_arr = np.minimum(spec_3d_arr * 255, 255).astype(np.uint8)
@@ -224,42 +182,18 @@ def upload():
                 "audio_duration": len( audio ) / sr,
                 "audio_id": audio_id
             } )
-
-    results = {
-        "configurations": config,
-        "channels": spec_all_channels
-    }
-    return jsonify(results), 201
+        
+    return jsonify(spec_all_channels[0]), 201
 
 @app.route("/upload-by-url", methods=['POST'])
 def upload_by_url():
     global audio_dict, num_spec_columns, n_bins
     request_info = request.json
     audio_url = request_info['audio_url']
-    spec_cal_method = request_info.get('spec_cal_method', None)
-    n_fft = request_info.get('n_fft', None)
-    bins_per_octave = request_info.get('bins_per_octave', None)
-    hop_length = request_info.get('hop_length', None)
-    num_spec_columns = request_info.get('num_spec_columns', None)
-    sr = request_info.get('sampling_rate', None)
-    min_frequency = request_info.get('min_frequency', None)
-    max_frequency = request_info.get('max_frequency', None)
 
-    if num_spec_columns is None:
-        num_spec_columns = 1000
-
-    audio_multi_channels, sr = load_audio_from_url(audio_url, sr)
+    audio_multi_channels, sr = load_audio_from_url(audio_url)
     if len( audio_multi_channels.shape ) == 1:
         audio_multi_channels = audio_multi_channels[ np.newaxis,: ]
-
-    if max_frequency is None:
-        max_frequency = sr // 2
-    else:
-        max_frequency = min( max_frequency, sr//2 )
-
-    ## multiple channels of the same audio should have the same length
-    if hop_length is None:
-        hop_length = audio_multi_channels.shape[1] // num_spec_columns
 
     spec_all_channels = []
     for pos in range( audio_multi_channels.shape[0] ):
@@ -269,16 +203,11 @@ def upload_by_url():
         print(audio_id)
         register_new_audio( audio, sr, audio_id )
         
-        whole_audio_spec, freqs, config = get_spectrogram( 
-                                                          audio, sr, 0, hop_length, 
-                                                          num_spec_columns = num_spec_columns, 
-                                                          min_frequency = min_frequency, 
-                                                          max_frequency = max_frequency,
-                                                          n_bins = n_bins,
-                                                          spec_cal_method = spec_cal_method,
-                                                          n_fft = n_fft,
-                                                          bins_per_octave = bins_per_octave
-                                                        )
+        whole_audio_spec, freqs = get_spectrogram( audio, sr, 0, len( audio ) / sr, 
+                        num_spec_columns = num_spec_columns, 
+                        n_bins = n_bins,
+                        spec_cal_method = "log-mel"
+                    )
         
         spec_3d_arr = np.asarray(whole_audio_spec)
         spec_3d_arr = np.minimum(spec_3d_arr * 255, 255).astype(np.uint8)
@@ -296,12 +225,8 @@ def upload_by_url():
                 "audio_duration": len( audio ) / sr,
                 "audio_id": audio_id
             } )
-
-    results = {
-        "configurations": config,
-        "channels": spec_all_channels
-    }
-    return jsonify(results), 201
+        
+    return jsonify(spec_all_channels[0]), 201
     
 @app.route("/get-audio-clip-spec", methods=['POST'])
 def get_audio_clip_spec():
@@ -309,45 +234,42 @@ def get_audio_clip_spec():
     
     request_info = request.json
 
+    print(request_info.keys())
+
     audio_id = request_info["audio_id"]
     start_time = request_info["start_time"]
-
-    spec_cal_method = request_info['spec_cal_method']
-    n_fft = request_info['n_fft']
-    bins_per_octave = request_info['bins_per_octave']
-    hop_length = request_info["hop_length"]
-    num_spec_columns = request_info['num_spec_columns']
-    sr = request_info['sampling_rate']
-    min_frequency = request_info['min_frequency']
-    max_frequency = request_info['max_frequency']
+    clip_duration = request_info["clip_duration"]
     
     audio = audio_dict[audio_id]["audio"]
+    sr = audio_dict[audio_id]["sr"]
+    
+    min_frequency = request_info.get( "min_frequency", 0 )
+    max_frequency = request_info.get( "max_frequency", sr//2 )
+    max_frequency = min( max_frequency, sr//2 )
+    
+    spec_cal_method = request_info.get( "spec_cal_method", "log-mel" )
+    
+    try:
+        n_fft = int(request_info.get("n_fft", None))
+    except:
+        n_fft = None
+    try:
+        bins_per_octave = int(request_info.get("bins_per_octave", None))
+    except:
+        bins_per_octave = None
 
-    if sr is None:
-        sr = audio_dict[audio_id]["sr"]
-    else:
-        ## check if the given sr is equal to the audio_dict[audio_id]["sr"]
-        if sr != audio_dict[audio_id]["sr"]:
-            ## resampling the audio array with the given sr
-            audio = librosa.resample(audio, orig_sr=audio_dict[audio_id]["sr"], target_sr=sr)
-            audio_dict[audio_id]["audio"] = audio
-            audio_dict[audio_id]["sr"] = sr
-    
-    if max_frequency is None:
-        max_frequency = sr // 2
-    else:
-        max_frequency = min( max_frequency, sr//2 )
-    
-    audio_clip_spec, freqs, config = get_spectrogram( 
-                                                          audio, sr, start_time, hop_length, 
-                                                          num_spec_columns = num_spec_columns, 
-                                                          min_frequency = min_frequency, 
-                                                          max_frequency = max_frequency,
-                                                          n_bins = n_bins,
-                                                          spec_cal_method = spec_cal_method,
-                                                          n_fft = n_fft,
-                                                          bins_per_octave = bins_per_octave
-                                                    )
+    if spec_cal_method == "log-mel":
+        print("Computing LogMel, n_fft =", n_fft)
+    elif spec_cal_method == "constant-q":
+        print("Computing Constant-Q, bins_per_octave=", bins_per_octave)
+
+    audio_clip_spec, freqs = get_spectrogram( audio, sr, start_time, clip_duration, 
+                     num_spec_columns = num_spec_columns, 
+                     min_frequency = min_frequency, max_frequency = max_frequency, n_bins = n_bins,
+                     spec_cal_method = spec_cal_method,
+                     n_fft = n_fft,
+                     bins_per_octave = bins_per_octave
+                   )
     
     spec_3d_arr = np.asarray(audio_clip_spec)
     spec_3d_arr = np.minimum(spec_3d_arr * 255, 255).astype(np.uint8)
@@ -362,11 +284,9 @@ def get_audio_clip_spec():
     base64_string = base64_bytes.decode()
     
     buffer.seek(0)
-
+    
     return {"spec":base64_string, 
-            "freqs": freqs.tolist(),
-            "configurations": config
-           }
+            "freqs": freqs.tolist()}
 
 @app.route("/get-audio-clip-wav", methods=['POST'])
 def get_audio_clip_wav():
@@ -398,7 +318,6 @@ def get_audio_clip_for_visualization():
     audio_id = request_info["audio_id"]
     start_time = request_info["start_time"]
     clip_duration = request_info["clip_duration"]
-    
     target_length = request_info.get("target_length", 100000)
     
     audio = audio_dict[audio_id]["audio"]
