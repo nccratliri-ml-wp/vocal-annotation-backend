@@ -172,16 +172,20 @@ def upload():
     sr = request.form.get('sampling_rate', type=int, default=None)
     min_frequency = request.form.get('min_frequency', type=int, default=None)
     max_frequency = request.form.get('max_frequency', type=int, default=None)
+    
+    print("1", min_frequency, max_frequency )
 
     if num_spec_columns is None:
         num_spec_columns = 1000
 
     audio_multi_channels, sr = librosa.load(newAudioFile, sr = sr, mono = False )  
 
-    if max_frequency is None:
+    if max_frequency is None or max_frequency <= 0 :
         max_frequency = sr // 2
     else:
         max_frequency = min( max_frequency, sr//2 )
+        
+    print("2", min_frequency, max_frequency )
         
     if len( audio_multi_channels.shape ) == 1:
         audio_multi_channels = audio_multi_channels[ np.newaxis,: ]
@@ -438,11 +442,24 @@ def get_labels():
                         )
     return jsonify({"labels":prediction}), 201
 
+@app.route("/post-annotations", methods=['POST'])
+def post_annotations():
+    global args
+    res = requests.post(
+        args.dataplatform_evolving_language_post_annotation_service_address,
+        data = json.dumps(request.json),
+        headers = { "Content-Type":"application/json",
+                    "accept":"application/json"
+                  }
+    ).json()
+    return jsonify(res), 201
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-flask_port", help="The port of the flask app.", default=8050, type=int)
-    parser.add_argument("-segmentation_service_address", help="The address to the WhisperSeg segmentation API.", default="http://localhost:8051/segment")
+    parser.add_argument("-segmentation_service_address", help="The address to the WhisperSeg segmentation API.", default="https://07bd-130-60-24-13.ngrok-free.app/segment")
+    parser.add_argument("-dataplatform_evolving_language_post_annotation_service_address", help="The address to the dataplatform evolving language (Used for post annotations).", default="https://dataplatform.evolvinglanguage.ch/animal_call/annotations/")
     args = parser.parse_args()
     
     audio_dict = {}

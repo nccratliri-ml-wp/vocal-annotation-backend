@@ -19,7 +19,7 @@ class SpecCalConstantQ:
         self.min_frequency = 50 if min_frequency is None else min_frequency
         if self.min_frequency <= 0:
             self.min_frequency = 50
-        self.max_frequency = int(sr/2) if max_frequency is None else max_frequency
+        self.max_frequency = int(sr/2) if (max_frequency is None or max_frequency <= 0) else max_frequency
         if self.max_frequency > int(sr/2):
             self.max_frequency = int(sr/2)
         self.n_bins = n_bins
@@ -83,13 +83,13 @@ class SpecCalLogMel:
         self.sr = sr
         self.hop_length = hop_length
         self.min_frequency = 0 if min_frequency is None or min_frequency < 0 else min_frequency
-        self.max_frequency = int(sr/2) if max_frequency is None else max_frequency
+        self.max_frequency = int(sr/2) if max_frequency is None or max_frequency <= 0 else max_frequency
         if self.max_frequency > int(sr/2):
             self.max_frequency = int(sr/2)
         self.n_bins = n_bins        
         self.cmap = matplotlib.colormaps.get_cmap(color_map)
         
-        if n_fft is None:
+        if n_fft is None or n_fft <= 0:
             if sr <= 32000:
                 n_fft = 512
             elif sr <= 80000:
