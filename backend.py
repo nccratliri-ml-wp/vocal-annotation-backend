@@ -178,7 +178,8 @@ def upload():
     if num_spec_columns is None:
         num_spec_columns = 1000
 
-    audio_multi_channels, sr = librosa.load(newAudioFile, sr = sr, mono = False )  
+    ## for certain reason after Flask transfer b"\r\n" can be prefixed to the data, so we need to remove them, otherwise the librosa load will trigger error
+    audio_multi_channels, sr = librosa.load( io.BytesIO(newAudioFile.read().lstrip())  , sr = sr, mono = False )  
 
     if max_frequency is None or max_frequency <= 0 :
         max_frequency = sr // 2
