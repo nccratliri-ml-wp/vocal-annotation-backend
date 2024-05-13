@@ -38,8 +38,15 @@ def load_audio_from_url(audio_url, sr = None):
     audio_data.export(wav_bytes, format="wav")
     wav_bytes.seek(0)  # Reset the pointer of the BytesIO object
     # Load the WAV bytes with librosa
-    audio, sr = librosa.load(wav_bytes, sr = sr, mono=False)  # 'sr=None' to preserve the original sampling rate
-    return audio, sr
+    
+    orig_audio, orig_sr = librosa.load(wav_bytes, sr = None, mono=False)
+    if sr is not None:
+        audio = librosa.resample( orig_audio, orig_sr = orig_sr, target_sr = sr )
+    else:
+        sr = orig_sr
+        audio = orig_audio.copy()
+    
+    return audio, sr, orig_audio, orig_sr
 
 def compute_md5(byte_stream):
     # Create an MD5 hash object
@@ -150,13 +157,17 @@ def resample_audio( audio, target_length = 100000 ):
     final_audio = final_audio.astype(np.float32)
     return final_audio
     
-def register_new_audio( audio, sr, audio_id ): 
+def register_new_audio( audio, sr, orig_audio, orig_sr, audio_id ): 
+    ## "audio" is only used when displaying the spectrogram
+    ## "orig_audio" is used for get wavform, and run segmentation
     global audio_dict
     audio_dict[audio_id] = {
         "audio":audio,
         "sr":sr,
-        "percentile_up":np.percentile(audio, 99.99),
-        "percentile_down":np.percentile(audio, 0.01)
+        "orig_audio":orig_audio,
+        "orig_sr":orig_sr,
+        "percentile_up":np.percentile(orig_audio, 99.99),
+        "percentile_down":np.percentile(orig_audio, 0.01)
     }   
 
 @app.route("/upload", methods=['POST'])
@@ -173,23 +184,25 @@ def upload():
     min_frequency = request.form.get('min_frequency', type=int, default=None)
     max_frequency = request.form.get('max_frequency', type=int, default=None)
     
-    print("1", min_frequency, max_frequency )
-
     if num_spec_columns is None:
         num_spec_columns = 1000
 
     ## for certain reason after Flask transfer b"\r\n" can be prefixed to the data, so we need to remove them, otherwise the librosa load will trigger error
-    audio_multi_channels, sr = librosa.load( io.BytesIO(newAudioFile.read().lstrip())  , sr = sr, mono = False )  
-
+    orig_audio_multi_channels, orig_sr = librosa.load( io.BytesIO(newAudioFile.read().lstrip()), sr = None, mono = False ) 
+    if sr is not None:
+        audio_multi_channels = librosa.resample( orig_audio_multi_channels, orig_sr = orig_sr, target_sr = sr )
+    else:
+        audio_multi_channels = orig_audio_multi_channels.copy()
+        sr = orig_sr
+    
     if max_frequency is None or max_frequency <= 0 :
         max_frequency = sr // 2
     else:
         max_frequency = min( max_frequency, sr//2 )
         
-    print("2", min_frequency, max_frequency )
-        
     if len( audio_multi_channels.shape ) == 1:
         audio_multi_channels = audio_multi_channels[ np.newaxis,: ]
+        orig_audio_multi_channels = orig_audio_multi_channels[ np.newaxis,: ]
 
     ## multiple channels of the same audio should have the same length
     if hop_length is None:
@@ -198,10 +211,10 @@ def upload():
     spec_all_channels = []
     for pos in range( audio_multi_channels.shape[0] ):
         audio = audio_multi_channels[pos]
+        orig_audio = orig_audio_multi_channels[pos]
 
         audio_id = str( uuid4() )
-        print(audio_id)
-        register_new_audio( audio, sr, audio_id )
+        register_new_audio( audio, sr, orig_audio, orig_sr, audio_id )
         
         whole_audio_spec, freqs, config = get_spectrogram( audio, sr, 0, hop_length, 
                                                           num_spec_columns = num_spec_columns, 
@@ -253,9 +266,10 @@ def upload_by_url():
     if num_spec_columns is None:
         num_spec_columns = 1000
 
-    audio_multi_channels, sr = load_audio_from_url(audio_url, sr)
+    audio_multi_channels, sr, orig_audio_multi_channels, orig_sr = load_audio_from_url(audio_url, sr)
     if len( audio_multi_channels.shape ) == 1:
         audio_multi_channels = audio_multi_channels[ np.newaxis,: ]
+        orig_audio_multi_channels = orig_audio_multi_channels[ np.newaxis,: ]
 
     if max_frequency is None:
         max_frequency = sr // 2
@@ -269,10 +283,10 @@ def upload_by_url():
     spec_all_channels = []
     for pos in range( audio_multi_channels.shape[0] ):
         audio = audio_multi_channels[pos]
+        orig_audio = orig_audio_multi_channels[pos]
     
         audio_id = str( uuid4() )
-        print(audio_id)
-        register_new_audio( audio, sr, audio_id )
+        register_new_audio( audio, sr, orig_audio, orig_sr, audio_id )
         
         whole_audio_spec, freqs, config = get_spectrogram( 
                                                           audio, sr, 0, hop_length, 
@@ -326,7 +340,9 @@ def get_audio_clip_spec():
     min_frequency = request_info['min_frequency']
     max_frequency = request_info['max_frequency']
     
-    audio = audio_dict[audio_id]["audio"]
+    audio = audio_dict[audio_id]["audio"]  
+
+    print( request_info )
 
     if sr is None:
         sr = audio_dict[audio_id]["sr"]
@@ -334,7 +350,9 @@ def get_audio_clip_spec():
         ## check if the given sr is equal to the audio_dict[audio_id]["sr"]
         if sr != audio_dict[audio_id]["sr"]:
             ## resampling the audio array with the given sr
-            audio = librosa.resample(audio, orig_sr=audio_dict[audio_id]["sr"], target_sr=sr)
+            audio = librosa.resample(audio_dict[audio_id]["orig_audio"], 
+                                     orig_sr=audio_dict[audio_id]["orig_sr"], 
+                                     target_sr=sr)
             audio_dict[audio_id]["audio"] = audio
             audio_dict[audio_id]["sr"] = sr
     
@@ -382,8 +400,8 @@ def get_audio_clip_wav():
     start_time = request_info["start_time"]
     clip_duration = request_info["clip_duration"]
     
-    audio = audio_dict[audio_id]["audio"]
-    sr = audio_dict[audio_id]["sr"]
+    audio = audio_dict[audio_id]["orig_audio"]
+    sr = audio_dict[audio_id]["orig_sr"]
     
     audio_clip = audio[ int( start_time * sr ): int( start_time * sr ) + int(clip_duration * sr) ] # int( (start_time + clip_duration) * sr ) ]
     ## always pad the audio to the specified length of duration
@@ -406,8 +424,8 @@ def get_audio_clip_for_visualization():
     
     target_length = request_info.get("target_length", 100000)
     
-    audio = audio_dict[audio_id]["audio"]
-    sr = audio_dict[audio_id]["sr"]
+    audio = audio_dict[audio_id]["orig_audio"]
+    sr = audio_dict[audio_id]["orig_sr"]
     percentile_up = audio_dict[audio_id]["percentile_up"]
     percentile_down = audio_dict[audio_id]["percentile_down"]
     
@@ -424,8 +442,8 @@ def get_labels():
     request_info = request.json
     audio_id = request_info["audio_id"]
     
-    audio = audio_dict[audio_id]["audio"]
-    sr = audio_dict[audio_id]["sr"]
+    audio = audio_dict[audio_id]["orig_audio"]
+    sr = audio_dict[audio_id]["orig_sr"]
     
     min_frequency = request_info.get( "min_frequency", None )
     spec_time_step = request_info.get( "spec_time_step", None )
