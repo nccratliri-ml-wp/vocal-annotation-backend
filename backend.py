@@ -15,11 +15,12 @@ import hashlib
 from scipy import signal
 import random
 from uuid import uuid4
-
 import requests
 from io import BytesIO
 from pydub import AudioSegment
-
+from datetime import datetime, timedelta
+import time
+import threading
 from spec_utils import SpecCalConstantQ, SpecCalLogMel
 from segmentation_utils import call_segment_service
 
@@ -167,9 +168,26 @@ def register_new_audio( audio, sr, orig_audio, orig_sr, audio_id ):
         "orig_audio":orig_audio,
         "orig_sr":orig_sr,
         "percentile_up":np.percentile(orig_audio, 99.99),
-        "percentile_down":np.percentile(orig_audio, 0.01)
+        "percentile_down":np.percentile(orig_audio, 0.01),
+        "timestamp":datetime.now()
     }   
 
+def release_idle_audios( audio_dict, idle_hours ):
+    print("Daemon thread for releasing idle audios is running ...")
+    while True:
+        current_time = datetime.now()
+        audio_ids_to_release = []
+        for audio_id in audio_dict:
+            if current_time - audio_dict[audio_id]["timestamp"] > timedelta(hours=idle_hours):
+                audio_ids_to_release.append( audio_id )
+        for audio_id in audio_ids_to_release:
+            try:
+                del audio_dict[audio_id]
+            except:
+                pass
+            print( "Audio %s has been deleted after being idle over %f hours"%(audio_id, idle_hours) )
+        time.sleep(60 * 60)  # Check every hour
+    
 @app.route("/upload", methods=['POST'])
 def upload():
     global audio_dict, n_bins
@@ -342,7 +360,9 @@ def get_audio_clip_spec():
     
     audio = audio_dict[audio_id]["audio"]  
 
-    print( request_info )
+    ## update the timestamp of the audio_id
+    audio_dict[audio_id]["timestamp"] = datetime.now()
+    
 
     if sr is None:
         sr = audio_dict[audio_id]["sr"]
@@ -400,6 +420,9 @@ def get_audio_clip_wav():
     start_time = request_info["start_time"]
     clip_duration = request_info["clip_duration"]
     
+    ## update the timestamp of the audio_id
+    audio_dict[audio_id]["timestamp"] = datetime.now()
+    
     audio = audio_dict[audio_id]["orig_audio"]
     sr = audio_dict[audio_id]["orig_sr"]
     
@@ -421,8 +444,10 @@ def get_audio_clip_for_visualization():
     audio_id = request_info["audio_id"]
     start_time = request_info["start_time"]
     clip_duration = request_info["clip_duration"]
-    
     target_length = request_info.get("target_length", 100000)
+    
+    ## update the timestamp of the audio_id
+    audio_dict[audio_id]["timestamp"] = datetime.now()
     
     audio = audio_dict[audio_id]["orig_audio"]
     sr = audio_dict[audio_id]["orig_sr"]
@@ -441,6 +466,9 @@ def get_labels():
     
     request_info = request.json
     audio_id = request_info["audio_id"]
+    
+    ## update the timestamp of the audio_id
+    audio_dict[audio_id]["timestamp"] = datetime.now()
     
     audio = audio_dict[audio_id]["orig_audio"]
     sr = audio_dict[audio_id]["orig_sr"]
@@ -474,6 +502,23 @@ def post_annotations():
     return jsonify(res), 201
 
 
+@app.route("/release-audio-given-ids", methods=['POST'])
+def release_audio_given_ids():
+    global audio_dict
+    request_info = request.json
+    audio_id_list = request_info["audio_id_list"]
+    for audio_id in audio_id_list:
+        try:
+            del audio_dict[str(audio_id)]
+            print( "%s is deleted from audio_dict"%( str(audio_id) ))
+        except:
+            print("Warning: %s in not in audio_dict"%( str(audio_id) ))
+            pass
+    
+    return jsonify({"status":"success"}), 201
+
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-flask_port", help="The port of the flask app.", default=8050, type=int)
@@ -484,6 +529,11 @@ if __name__ == '__main__':
     audio_dict = {}
     num_spec_columns = 1000
     n_bins = 200
+    idle_hours = 48
+    
+    thread = threading.Thread(target=release_idle_audios, args=(audio_dict, idle_hours))
+    thread.daemon = True
+    thread.start()
     
     print( "Waiting for requests..." )
 
