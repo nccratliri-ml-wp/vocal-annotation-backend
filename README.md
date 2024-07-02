@@ -202,7 +202,7 @@ response = requests.post(
     }),
     headers = {"content-type":"application/json"}
 ).json()
-# Audio(base64.b64decode(response["wav"]))
+Audio(base64.b64decode(response["wav"]))
 ```
 
 ## Post Labels
@@ -440,7 +440,7 @@ audio_id
 
 
 
-    'fd61653f-5e57-4bae-9fd7-edbfdc2eb6f3'
+    '41525b82-f471-4699-85b0-1cfe44ed828b'
 
 
 
@@ -449,7 +449,7 @@ Suppose human annotator annotated the first 15 seconds
 
 
 ```python
-df = pd.read_csv( "example_audios/human-in-the-loop-training-example/partial_annotations.csv" )
+df = pd.read_csv( "example_audios/human-in-the-loop-training-example/annotations.csv" )
 df.head()
 ```
 
@@ -488,8 +488,8 @@ df.head()
       <th>0</th>
       <td>0.000000</td>
       <td>0.121816</td>
-      <td>Unknown</td>
-      <td>Unknown</td>
+      <td>zebra finch</td>
+      <td>bird1</td>
       <td>U</td>
       <td>audio.wav</td>
       <td>0</td>
@@ -498,8 +498,8 @@ df.head()
       <th>1</th>
       <td>0.178039</td>
       <td>0.271743</td>
-      <td>Unknown</td>
-      <td>Unknown</td>
+      <td>zebra finch</td>
+      <td>bird1</td>
       <td>U</td>
       <td>audio.wav</td>
       <td>0</td>
@@ -508,8 +508,8 @@ df.head()
       <th>2</th>
       <td>0.290484</td>
       <td>0.393559</td>
-      <td>Unknown</td>
-      <td>Unknown</td>
+      <td>zebra finch</td>
+      <td>bird1</td>
       <td>U</td>
       <td>audio.wav</td>
       <td>0</td>
@@ -518,8 +518,8 @@ df.head()
       <th>3</th>
       <td>0.440411</td>
       <td>0.599709</td>
-      <td>Unknown</td>
-      <td>Unknown</td>
+      <td>zebra finch</td>
+      <td>bird1</td>
       <td>A</td>
       <td>audio.wav</td>
       <td>0</td>
@@ -528,8 +528,8 @@ df.head()
       <th>4</th>
       <td>0.599709</td>
       <td>0.862082</td>
-      <td>Unknown</td>
-      <td>Unknown</td>
+      <td>zebra finch</td>
+      <td>bird1</td>
       <td>B</td>
       <td>audio.wav</td>
       <td>0</td>
@@ -569,7 +569,8 @@ response
        'status': 'ready'},
       {'eta': '--:--:--',
        'model_name': 'new-whisperseg-bengalese-finch',
-       'status': 'ready'}]}
+       'status': 'ready'},
+      {'eta': '--:--:--', 'model_name': 'whisperseg-new-v1.0', 'status': 'ready'}]}
 
 
 
@@ -605,6 +606,7 @@ all_models
      {'eta': '--:--:--',
       'model_name': 'new-whisperseg-bengalese-finch',
       'status': 'ready'},
+     {'eta': '--:--:--', 'model_name': 'whisperseg-new-v1.0', 'status': 'ready'},
      {'eta': '--:--:--', 'model_name': 'whisperseg-base', 'status': 'ready'},
      {'eta': '--:--:--', 'model_name': 'whisperseg-large', 'status': 'ready'},
      {'eta': '--:--:--',
@@ -618,7 +620,8 @@ all_models
       'status': 'ready'},
      {'eta': '--:--:--',
       'model_name': 'new-whisperseg-bengalese-finch',
-      'status': 'ready'}]
+      'status': 'ready'},
+     {'eta': '--:--:--', 'model_name': 'whisperseg-new-v1.0', 'status': 'ready'}]
 
 
 
@@ -627,14 +630,14 @@ all_models
 
 ```python
 # audio_id
-annotated_areas = [ { "onset":0, "offset":15 } ]  ## the first 15 seconds are annotated
+annotated_areas = [ { "onset":0, "offset":45 } ]  ## the first 15 seconds are annotated
 human_labels = [dict(df.iloc[idx]) for idx in range(len(df)) ]  ## get the human_labels
 for item in human_labels: ## to make it JSON serializable
     item["onset"] = float(item["onset"])
     item["offset"] = float(item["offset"])  
     item["channelIndex"] = int(item["channelIndex"])
 
-new_model_name = "whisperseg-new-v1.0"
+new_model_name = "whisperseg-base-debug-v1.0"
 inital_model_name = "whisperseg-base"
 min_frequency = 0
 ```
@@ -688,7 +691,7 @@ response = requests.post(
         "audio_id":audio_id,
         "annotated_areas":annotated_areas,
         "human_labels":human_labels,
-        "model_name":"whisperseg-new-v1.0",
+        "model_name":"whisperseg-base-debug-v1.0",
         "min_frequency": 0
     }),
     headers = {"content-type":"application/json"}
@@ -743,8 +746,8 @@ out_df
       <th>0</th>
       <td>0.000000</td>
       <td>0.121816</td>
-      <td>Unknown</td>
-      <td>Unknown</td>
+      <td>zebra finch</td>
+      <td>bird1</td>
       <td>U</td>
       <td>audio.wav</td>
       <td>0</td>
@@ -753,8 +756,8 @@ out_df
       <th>1</th>
       <td>0.178039</td>
       <td>0.271743</td>
-      <td>Unknown</td>
-      <td>Unknown</td>
+      <td>zebra finch</td>
+      <td>bird1</td>
       <td>U</td>
       <td>audio.wav</td>
       <td>0</td>
@@ -763,8 +766,8 @@ out_df
       <th>2</th>
       <td>0.290484</td>
       <td>0.393559</td>
-      <td>Unknown</td>
-      <td>Unknown</td>
+      <td>zebra finch</td>
+      <td>bird1</td>
       <td>U</td>
       <td>audio.wav</td>
       <td>0</td>
@@ -773,8 +776,8 @@ out_df
       <th>3</th>
       <td>0.440411</td>
       <td>0.599709</td>
-      <td>Unknown</td>
-      <td>Unknown</td>
+      <td>zebra finch</td>
+      <td>bird1</td>
       <td>A</td>
       <td>audio.wav</td>
       <td>0</td>
@@ -783,8 +786,8 @@ out_df
       <th>4</th>
       <td>0.599709</td>
       <td>0.862082</td>
-      <td>Unknown</td>
-      <td>Unknown</td>
+      <td>zebra finch</td>
+      <td>bird1</td>
       <td>B</td>
       <td>audio.wav</td>
       <td>0</td>
@@ -800,58 +803,58 @@ out_df
       <td>...</td>
     </tr>
     <tr>
-      <th>410</th>
-      <td>204.103000</td>
-      <td>204.293000</td>
-      <td>Unknown</td>
-      <td>Unknown</td>
+      <th>411</th>
+      <td>204.100000</td>
+      <td>204.310000</td>
+      <td>zebra finch</td>
+      <td>bird1</td>
       <td>C</td>
       <td>audio.wav</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>411</th>
-      <td>204.300000</td>
-      <td>204.520000</td>
-      <td>Unknown</td>
-      <td>Unknown</td>
-      <td>B</td>
-      <td>audio.wav</td>
-      <td>0</td>
-    </tr>
-    <tr>
       <th>412</th>
-      <td>204.520000</td>
-      <td>204.770000</td>
-      <td>Unknown</td>
-      <td>Unknown</td>
-      <td>B</td>
-      <td>audio.wav</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>413</th>
-      <td>204.853000</td>
-      <td>205.030000</td>
-      <td>Unknown</td>
-      <td>Unknown</td>
+      <td>204.310000</td>
+      <td>204.513000</td>
+      <td>zebra finch</td>
+      <td>bird1</td>
       <td>A</td>
       <td>audio.wav</td>
       <td>0</td>
     </tr>
     <tr>
+      <th>413</th>
+      <td>204.520000</td>
+      <td>204.773000</td>
+      <td>zebra finch</td>
+      <td>bird1</td>
+      <td>B</td>
+      <td>audio.wav</td>
+      <td>0</td>
+    </tr>
+    <tr>
       <th>414</th>
+      <td>204.847000</td>
+      <td>205.027000</td>
+      <td>zebra finch</td>
+      <td>bird1</td>
+      <td>A</td>
+      <td>audio.wav</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>415</th>
       <td>205.030000</td>
-      <td>205.303000</td>
-      <td>Unknown</td>
-      <td>Unknown</td>
+      <td>205.300000</td>
+      <td>zebra finch</td>
+      <td>bird1</td>
       <td>B</td>
       <td>audio.wav</td>
       <td>0</td>
     </tr>
   </tbody>
 </table>
-<p>415 rows × 7 columns</p>
+<p>416 rows × 7 columns</p>
 </div>
 
 
@@ -862,3 +865,8 @@ out_df.to_csv("example_audios/human-in-the-loop-training-example/pred_annotation
 ```
 
 This prediction can be rendered on the frontend.
+
+
+```python
+
+```

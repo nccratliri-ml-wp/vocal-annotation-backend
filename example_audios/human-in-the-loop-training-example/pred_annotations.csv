@@ -1,416 +1,417 @@
 onset,offset,species,individual,clustername,filename,channelIndex
-0.0,0.121815945,Unknown,Unknown,U,audio.wav,0
-0.178038688,0.271743261,Unknown,Unknown,U,audio.wav,0
-0.290484176,0.393559206,Unknown,Unknown,U,audio.wav,0
-0.440411492,0.599709266,Unknown,Unknown,A,audio.wav,0
-0.599709266,0.862082069,Unknown,Unknown,B,audio.wav,0
-0.880822984,1.077602587,Unknown,Unknown,C,audio.wav,0
-1.143195788,1.311864019,Unknown,Unknown,A,audio.wav,0
-1.302493561,1.564866365,Unknown,Unknown,B,audio.wav,0
-1.864720998,1.967796028,Unknown,Unknown,U,audio.wav,0
-2.005277857,2.117723344,Unknown,Unknown,U,audio.wav,0
-2.436318892,2.548764379,Unknown,Unknown,U,audio.wav,0
-2.698691696,2.773655354,Unknown,Unknown,U,audio.wav,0
-2.839248555,2.989175871,Unknown,Unknown,A,audio.wav,0
-2.998546328,3.223437303,Unknown,Unknown,B,audio.wav,0
-3.23280776,3.43895782,Unknown,Unknown,C,audio.wav,0
-3.495180564,3.663848795,Unknown,Unknown,A,audio.wav,0
-3.68258971,3.926221599,Unknown,Unknown,B,audio.wav,0
-4.029296629,4.254187603,Unknown,Unknown,C,audio.wav,0
-4.329151262,4.441596749,Unknown,Unknown,U,audio.wav,0
-4.479078578,4.647746809,Unknown,Unknown,A,audio.wav,0
-4.629005895,4.891378698,Unknown,Unknown,B,audio.wav,0
-4.928860527,5.116269673,Unknown,Unknown,C,audio.wav,0
-5.715978939,5.828424426,Unknown,Unknown,U,audio.wav,0
-5.865906255,5.9877222,Unknown,Unknown,U,audio.wav,0
-6.015833571,6.221983632,Unknown,Unknown,A,audio.wav,0
-6.212613174,6.50309735,Unknown,Unknown,B,audio.wav,0
-8.39592972,8.517745664,Unknown,Unknown,U,audio.wav,0
-8.752007096,8.864452583,Unknown,Unknown,U,audio.wav,0
-8.91130487,8.986268528,Unknown,Unknown,U,audio.wav,0
-9.070602644,9.248641332,Unknown,Unknown,A,audio.wav,0
-9.248641332,9.501643678,Unknown,Unknown,B,audio.wav,0
-9.520384593,9.726534653,Unknown,Unknown,C,audio.wav,0
-9.764016482,9.951425628,Unknown,Unknown,C,audio.wav,0
-10.00764837,10.21379843,Unknown,Unknown,A,audio.wav,0
-10.19505752,10.47617124,Unknown,Unknown,B,audio.wav,0
-10.71980312,10.89784181,Unknown,Unknown,A,audio.wav,0
-10.88847136,11.15084416,Unknown,Unknown,B,audio.wav,0
-11.18832599,11.39447605,Unknown,Unknown,C,audio.wav,0
-11.44132833,11.62873748,Unknown,Unknown,A,audio.wav,0
-11.61936702,11.88173983,Unknown,Unknown,B,audio.wav,0
-11.94733303,12.172224,Unknown,Unknown,C,audio.wav,0
-12.57515366,12.69696961,Unknown,Unknown,U,audio.wav,0
-12.73445144,12.91249013,Unknown,Unknown,A,audio.wav,0
-12.91249013,13.17486293,Unknown,Unknown,B,audio.wav,0
-13.28730842,13.60590397,Unknown,Unknown,A,audio.wav,0
-13.75583128,13.84953585,Unknown,Unknown,U,audio.wav,0
-13.86827677,14.07442683,Unknown,Unknown,A,audio.wav,0
-14.06505637,14.33679963,Unknown,Unknown,B,audio.wav,0
-14.33679963,14.54294969,Unknown,Unknown,C,audio.wav,0
-14.59917244,14.8053225,Unknown,Unknown,C,audio.wav,0
-16.74,16.827,Unknown,Unknown,U,audio.wav,0
-16.85,16.95,Unknown,Unknown,U,audio.wav,0
-16.972,17.148,Unknown,Unknown,A,audio.wav,0
-17.142,17.382,Unknown,Unknown,B,audio.wav,0
-17.407,17.613,Unknown,Unknown,C,audio.wav,0
-17.64,17.82,Unknown,Unknown,A,audio.wav,0
-17.82,18.067,Unknown,Unknown,B,audio.wav,0
-18.15,18.32,Unknown,Unknown,A,audio.wav,0
-18.313,18.563,Unknown,Unknown,B,audio.wav,0
-18.673,18.857,Unknown,Unknown,C,audio.wav,0
-18.883,19.083,Unknown,Unknown,C,audio.wav,0
-19.113,19.283,Unknown,Unknown,A,audio.wav,0
-19.283,19.533,Unknown,Unknown,B,audio.wav,0
-19.62,19.817,Unknown,Unknown,A,audio.wav,0
-19.813,20.043,Unknown,Unknown,B,audio.wav,0
-20.163,20.34,Unknown,Unknown,A,audio.wav,0
-20.337,20.583,Unknown,Unknown,B,audio.wav,0
-20.61,20.823,Unknown,Unknown,C,audio.wav,0
-20.893,21.07,Unknown,Unknown,A,audio.wav,0
-21.07,21.317,Unknown,Unknown,B,audio.wav,0
-21.393,21.54,Unknown,Unknown,C,audio.wav,0
-21.553,21.763,Unknown,Unknown,C,audio.wav,0
-21.78,21.973,Unknown,Unknown,A,audio.wav,0
-21.977,22.237,Unknown,Unknown,B,audio.wav,0
-23.71,23.833,Unknown,Unknown,U,audio.wav,0
-23.958,24.152,Unknown,Unknown,U,audio.wav,0
-24.177,24.357,Unknown,Unknown,A,audio.wav,0
-24.353,24.6,Unknown,Unknown,B,audio.wav,0
-24.63,24.833,Unknown,Unknown,C,audio.wav,0
-24.867,25.027,Unknown,Unknown,A,audio.wav,0
-25.04,25.283,Unknown,Unknown,B,audio.wav,0
-25.307,25.523,Unknown,Unknown,C,audio.wav,0
-25.61,25.78,Unknown,Unknown,A,audio.wav,0
-25.777,26.043,Unknown,Unknown,B,audio.wav,0
-27.85,27.97,Unknown,Unknown,U,audio.wav,0
-28.633,28.74,Unknown,Unknown,U,audio.wav,0
-29.217,29.41,Unknown,Unknown,U,audio.wav,0
-29.443,29.617,Unknown,Unknown,A,audio.wav,0
-29.617,29.863,Unknown,Unknown,B,audio.wav,0
-29.897,30.097,Unknown,Unknown,C,audio.wav,0
-30.137,30.313,Unknown,Unknown,C,audio.wav,0
-30.407,30.58,Unknown,Unknown,A,audio.wav,0
-30.58,30.823,Unknown,Unknown,B,audio.wav,0
-30.847,31.063,Unknown,Unknown,C,audio.wav,0
-31.107,31.283,Unknown,Unknown,A,audio.wav,0
-31.28,31.547,Unknown,Unknown,B,audio.wav,0
-32.11,32.29,Unknown,Unknown,A,audio.wav,0
-32.287,32.543,Unknown,Unknown,B,audio.wav,0
-32.603,32.79,Unknown,Unknown,A,audio.wav,0
-32.783,33.04,Unknown,Unknown,B,audio.wav,0
-33.14,33.33,Unknown,Unknown,U,audio.wav,0
-35.28,35.403,Unknown,Unknown,U,audio.wav,0
-36.8,36.903,Unknown,Unknown,U,audio.wav,0
-37.02,37.173,Unknown,Unknown,U,audio.wav,0
-37.223,37.34,Unknown,Unknown,U,audio.wav,0
-37.578,37.683,Unknown,Unknown,U,audio.wav,0
-38.047,38.16,Unknown,Unknown,U,audio.wav,0
-40.657,40.783,Unknown,Unknown,U,audio.wav,0
-41.267,41.383,Unknown,Unknown,U,audio.wav,0
-42.033,42.15,Unknown,Unknown,U,audio.wav,0
-42.257,42.357,Unknown,Unknown,U,audio.wav,0
-42.39,42.493,Unknown,Unknown,U,audio.wav,0
-42.507,42.623,Unknown,Unknown,U,audio.wav,0
-42.793,42.9,Unknown,Unknown,U,audio.wav,0
-43.053,43.153,Unknown,Unknown,U,audio.wav,0
-43.207,43.428,Unknown,Unknown,U,audio.wav,0
-43.653,43.783,Unknown,Unknown,U,audio.wav,0
-44.523,44.763,Unknown,Unknown,U,audio.wav,0
-45.073,45.222,Unknown,Unknown,B,audio.wav,0
-45.218,45.372,Unknown,Unknown,B,audio.wav,0
-45.557,45.66,Unknown,Unknown,U,audio.wav,0
-46.28,46.387,Unknown,Unknown,U,audio.wav,0
-46.423,46.517,Unknown,Unknown,U,audio.wav,0
-46.55,46.703,Unknown,Unknown,A,audio.wav,0
-46.72,46.963,Unknown,Unknown,B,audio.wav,0
-46.99,47.197,Unknown,Unknown,C,audio.wav,0
-47.22,47.383,Unknown,Unknown,A,audio.wav,0
-47.383,47.63,Unknown,Unknown,B,audio.wav,0
-47.703,47.773,Unknown,Unknown,U,audio.wav,0
-47.803,47.973,Unknown,Unknown,A,audio.wav,0
-47.97,48.223,Unknown,Unknown,B,audio.wav,0
-48.253,48.467,Unknown,Unknown,C,audio.wav,0
-48.517,48.68,Unknown,Unknown,A,audio.wav,0
-48.68,48.923,Unknown,Unknown,B,audio.wav,0
-48.963,49.17,Unknown,Unknown,C,audio.wav,0
-49.25,49.377,Unknown,Unknown,U,audio.wav,0
-49.4,49.503,Unknown,Unknown,U,audio.wav,0
-49.663,49.77,Unknown,Unknown,U,audio.wav,0
-51.715,51.825,Unknown,Unknown,U,audio.wav,0
-52.59,52.71,Unknown,Unknown,U,audio.wav,0
-53.295,53.4,Unknown,Unknown,U,audio.wav,0
-53.45,53.545,Unknown,Unknown,U,audio.wav,0
-53.56,53.665,Unknown,Unknown,U,audio.wav,0
-53.68,53.85,Unknown,Unknown,A,audio.wav,0
-53.85,54.095,Unknown,Unknown,B,audio.wav,0
-54.115,54.325,Unknown,Unknown,C,audio.wav,0
-54.36,54.517,Unknown,Unknown,A,audio.wav,0
-54.51,54.76,Unknown,Unknown,B,audio.wav,0
-54.8,55.01,Unknown,Unknown,C,audio.wav,0
-55.043,55.227,Unknown,Unknown,A,audio.wav,0
-55.227,55.477,Unknown,Unknown,B,audio.wav,0
-55.537,55.72,Unknown,Unknown,A,audio.wav,0
-55.717,55.973,Unknown,Unknown,B,audio.wav,0
-56.03,56.223,Unknown,Unknown,A,audio.wav,0
-56.22,56.48,Unknown,Unknown,B,audio.wav,0
-58.603,58.72,Unknown,Unknown,U,audio.wav,0
-58.887,58.997,Unknown,Unknown,U,audio.wav,0
-59.023,59.23,Unknown,Unknown,A,audio.wav,0
-59.247,59.423,Unknown,Unknown,A,audio.wav,0
-59.423,59.673,Unknown,Unknown,B,audio.wav,0
-59.703,59.93,Unknown,Unknown,C,audio.wav,0
-60.163,60.343,Unknown,Unknown,A,audio.wav,0
-60.34,60.59,Unknown,Unknown,B,audio.wav,0
-60.623,60.847,Unknown,Unknown,C,audio.wav,0
-60.877,61.043,Unknown,Unknown,A,audio.wav,0
-61.043,61.303,Unknown,Unknown,B,audio.wav,0
-61.353,61.583,Unknown,Unknown,C,audio.wav,0
-61.607,61.79,Unknown,Unknown,A,audio.wav,0
-61.787,62.043,Unknown,Unknown,B,audio.wav,0
-62.083,62.287,Unknown,Unknown,C,audio.wav,0
-62.38,62.563,Unknown,Unknown,A,audio.wav,0
-62.63,62.84,Unknown,Unknown,C,audio.wav,0
-62.863,63.043,Unknown,Unknown,A,audio.wav,0
-63.04,63.307,Unknown,Unknown,B,audio.wav,0
-64.177,64.367,Unknown,Unknown,A,audio.wav,0
-64.44,64.547,Unknown,Unknown,U,audio.wav,0
-64.57,64.74,Unknown,Unknown,A,audio.wav,0
-64.737,64.987,Unknown,Unknown,B,audio.wav,0
-65.053,65.28,Unknown,Unknown,C,audio.wav,0
-65.307,65.483,Unknown,Unknown,A,audio.wav,0
-65.477,65.743,Unknown,Unknown,B,audio.wav,0
-65.797,66.027,Unknown,Unknown,C,audio.wav,0
-66.32,66.54,Unknown,Unknown,C,audio.wav,0
-66.592,66.842,Unknown,Unknown,C,audio.wav,0
-68.873,69.06,Unknown,Unknown,C,audio.wav,0
-69.687,69.873,Unknown,Unknown,C,audio.wav,0
-70.58,70.693,Unknown,Unknown,U,audio.wav,0
-70.703,70.873,Unknown,Unknown,A,audio.wav,0
-70.873,71.11,Unknown,Unknown,B,audio.wav,0
-71.143,71.323,Unknown,Unknown,C,audio.wav,0
-71.327,71.54,Unknown,Unknown,A,audio.wav,0
-71.533,71.783,Unknown,Unknown,B,audio.wav,0
-71.83,72.023,Unknown,Unknown,C,audio.wav,0
-72.027,72.237,Unknown,Unknown,B,audio.wav,0
-72.237,72.483,Unknown,Unknown,B,audio.wav,0
-73.02,73.217,Unknown,Unknown,U,audio.wav,0
-73.247,73.42,Unknown,Unknown,A,audio.wav,0
-73.42,73.673,Unknown,Unknown,B,audio.wav,0
-73.7,73.88,Unknown,Unknown,C,audio.wav,0
-73.887,74.103,Unknown,Unknown,A,audio.wav,0
-74.1,74.353,Unknown,Unknown,B,audio.wav,0
-74.44,74.547,Unknown,Unknown,U,audio.wav,0
-74.56,74.73,Unknown,Unknown,A,audio.wav,0
-74.733,74.99,Unknown,Unknown,B,audio.wav,0
-75.02,75.237,Unknown,Unknown,C,audio.wav,0
-75.257,75.437,Unknown,Unknown,A,audio.wav,0
-75.437,75.693,Unknown,Unknown,B,audio.wav,0
-75.73,75.943,Unknown,Unknown,C,audio.wav,0
-75.96,76.15,Unknown,Unknown,A,audio.wav,0
-76.153,76.317,Unknown,Unknown,B,audio.wav,0
-79.493,79.607,Unknown,Unknown,U,audio.wav,0
-79.62,79.717,Unknown,Unknown,U,audio.wav,0
-79.737,79.913,Unknown,Unknown,A,audio.wav,0
-79.91,80.16,Unknown,Unknown,B,audio.wav,0
-80.18,80.363,Unknown,Unknown,C,audio.wav,0
-80.367,80.593,Unknown,Unknown,C,audio.wav,0
-80.593,80.86,Unknown,Unknown,B,audio.wav,0
-86.26,86.453,Unknown,Unknown,U,audio.wav,0
-87.057,87.25,Unknown,Unknown,U,audio.wav,0
-87.273,87.47,Unknown,Unknown,U,audio.wav,0
-89.107,89.31,Unknown,Unknown,U,audio.wav,0
-90.017,90.113,Unknown,Unknown,U,audio.wav,0
-90.127,90.223,Unknown,Unknown,U,audio.wav,0
-90.227,90.392,Unknown,Unknown,A,audio.wav,0
-90.392,90.642,Unknown,Unknown,B,audio.wav,0
-90.663,90.847,Unknown,Unknown,C,audio.wav,0
-90.85,91.057,Unknown,Unknown,A,audio.wav,0
-91.057,91.303,Unknown,Unknown,B,audio.wav,0
-91.323,91.523,Unknown,Unknown,C,audio.wav,0
-91.523,91.717,Unknown,Unknown,C,audio.wav,0
-91.74,91.99,Unknown,Unknown,B,audio.wav,0
-92.05,92.373,Unknown,Unknown,C,audio.wav,0
-93.92,94.11,Unknown,Unknown,A,audio.wav,0
-94.13,94.333,Unknown,Unknown,A,audio.wav,0
-96.24,96.443,Unknown,Unknown,U,audio.wav,0
-101.87,102.073,Unknown,Unknown,U,audio.wav,0
-104.02,104.233,Unknown,Unknown,U,audio.wav,0
-104.915,105.095,Unknown,Unknown,U,audio.wav,0
-105.317,105.433,Unknown,Unknown,U,audio.wav,0
-105.513,105.603,Unknown,Unknown,U,audio.wav,0
-105.617,106.037,Unknown,Unknown,B,audio.wav,0
-106.047,106.22,Unknown,Unknown,C,audio.wav,0
-106.237,106.46,Unknown,Unknown,A,audio.wav,0
-106.457,106.703,Unknown,Unknown,B,audio.wav,0
-106.72,106.913,Unknown,Unknown,C,audio.wav,0
-106.92,107.137,Unknown,Unknown,B,audio.wav,0
-107.137,107.38,Unknown,Unknown,B,audio.wav,0
-107.44,107.61,Unknown,Unknown,A,audio.wav,0
-107.607,107.857,Unknown,Unknown,B,audio.wav,0
-107.877,108.07,Unknown,Unknown,C,audio.wav,0
-108.083,108.308,Unknown,Unknown,B,audio.wav,0
-108.308,108.568,Unknown,Unknown,B,audio.wav,0
-108.777,108.86,Unknown,Unknown,U,audio.wav,0
-108.873,109.067,Unknown,Unknown,A,audio.wav,0
-109.063,109.313,Unknown,Unknown,B,audio.wav,0
-109.347,109.54,Unknown,Unknown,C,audio.wav,0
-110.48,110.61,Unknown,Unknown,U,audio.wav,0
-112.053,112.243,Unknown,Unknown,U,audio.wav,0
-113.967,114.153,Unknown,Unknown,U,audio.wav,0
-116.89,117.077,Unknown,Unknown,U,audio.wav,0
-120.11,120.287,Unknown,Unknown,U,audio.wav,0
-121.03,121.147,Unknown,Unknown,U,audio.wav,0
-121.18,121.343,Unknown,Unknown,A,audio.wav,0
-121.343,121.597,Unknown,Unknown,B,audio.wav,0
-121.633,121.803,Unknown,Unknown,C,audio.wav,0
-121.803,122.017,Unknown,Unknown,B,audio.wav,0
-122.02,122.27,Unknown,Unknown,B,audio.wav,0
-122.3,122.487,Unknown,Unknown,C,audio.wav,0
-122.487,122.7,Unknown,Unknown,C,audio.wav,0
-122.703,122.953,Unknown,Unknown,B,audio.wav,0
-122.987,123.17,Unknown,Unknown,C,audio.wav,0
-123.173,123.393,Unknown,Unknown,C,audio.wav,0
-123.41,123.653,Unknown,Unknown,B,audio.wav,0
-123.697,124.03,Unknown,Unknown,C,audio.wav,0
-124.05,124.24,Unknown,Unknown,C,audio.wav,0
-124.25,124.457,Unknown,Unknown,C,audio.wav,0
-124.457,124.707,Unknown,Unknown,B,audio.wav,0
-124.768,124.958,Unknown,Unknown,A,audio.wav,0
-124.947,125.208,Unknown,Unknown,B,audio.wav,0
-126.007,126.197,Unknown,Unknown,U,audio.wav,0
-126.243,126.363,Unknown,Unknown,U,audio.wav,0
-126.453,126.553,Unknown,Unknown,U,audio.wav,0
-126.577,126.747,Unknown,Unknown,A,audio.wav,0
-126.747,126.99,Unknown,Unknown,B,audio.wav,0
-127.02,127.213,Unknown,Unknown,C,audio.wav,0
-127.23,127.44,Unknown,Unknown,A,audio.wav,0
-127.447,127.697,Unknown,Unknown,B,audio.wav,0
-127.747,127.927,Unknown,Unknown,A,audio.wav,0
-127.927,128.177,Unknown,Unknown,B,audio.wav,0
-128.3,128.473,Unknown,Unknown,A,audio.wav,0
-128.473,128.73,Unknown,Unknown,B,audio.wav,0
-136.04,136.213,Unknown,Unknown,U,audio.wav,0
-136.337,136.433,Unknown,Unknown,U,audio.wav,0
-136.46,136.627,Unknown,Unknown,A,audio.wav,0
-136.633,136.86,Unknown,Unknown,B,audio.wav,0
-136.9,137.1,Unknown,Unknown,C,audio.wav,0
-137.107,137.31,Unknown,Unknown,B,audio.wav,0
-137.31,137.553,Unknown,Unknown,B,audio.wav,0
-137.6,137.717,Unknown,Unknown,C,audio.wav,0
-137.727,137.967,Unknown,Unknown,B,audio.wav,0
-138.02,138.197,Unknown,Unknown,A,audio.wav,0
-138.192,138.438,Unknown,Unknown,B,audio.wav,0
-138.557,138.82,Unknown,Unknown,C,audio.wav,0
-138.873,139.057,Unknown,Unknown,A,audio.wav,0
-139.053,139.297,Unknown,Unknown,B,audio.wav,0
-139.363,139.547,Unknown,Unknown,A,audio.wav,0
-139.543,139.797,Unknown,Unknown,B,audio.wav,0
-139.907,140.08,Unknown,Unknown,A,audio.wav,0
-140.077,140.35,Unknown,Unknown,B,audio.wav,0
-142.193,142.317,Unknown,Unknown,U,audio.wav,0
-147.617,147.807,Unknown,Unknown,U,audio.wav,0
-148.403,148.59,Unknown,Unknown,C,audio.wav,0
-149.4,149.593,Unknown,Unknown,U,audio.wav,0
-150.333,150.52,Unknown,Unknown,U,audio.wav,0
-150.577,150.677,Unknown,Unknown,U,audio.wav,0
-150.69,150.86,Unknown,Unknown,A,audio.wav,0
-150.86,151.103,Unknown,Unknown,B,audio.wav,0
-151.137,151.31,Unknown,Unknown,C,audio.wav,0
-151.32,151.527,Unknown,Unknown,A,audio.wav,0
-151.53,151.78,Unknown,Unknown,B,audio.wav,0
-151.803,152.003,Unknown,Unknown,C,audio.wav,0
-152.02,152.207,Unknown,Unknown,A,audio.wav,0
-152.213,152.47,Unknown,Unknown,B,audio.wav,0
-153.86,154.053,Unknown,Unknown,U,audio.wav,0
-154.91,155.105,Unknown,Unknown,U,audio.wav,0
-155.927,156.11,Unknown,Unknown,U,audio.wav,0
-157.253,157.437,Unknown,Unknown,U,audio.wav,0
-157.55,157.747,Unknown,Unknown,U,audio.wav,0
-158.507,158.62,Unknown,Unknown,U,audio.wav,0
-158.647,158.763,Unknown,Unknown,U,audio.wav,0
-158.787,158.96,Unknown,Unknown,A,audio.wav,0
-158.96,159.213,Unknown,Unknown,B,audio.wav,0
-159.237,159.457,Unknown,Unknown,C,audio.wav,0
-159.687,159.783,Unknown,Unknown,U,audio.wav,0
-159.787,159.97,Unknown,Unknown,A,audio.wav,0
-159.97,160.217,Unknown,Unknown,B,audio.wav,0
-160.243,160.43,Unknown,Unknown,C,audio.wav,0
-160.437,160.643,Unknown,Unknown,A,audio.wav,0
-160.637,160.9,Unknown,Unknown,B,audio.wav,0
-160.933,161.143,Unknown,Unknown,A,audio.wav,0
-161.443,161.563,Unknown,Unknown,U,audio.wav,0
-161.578,161.748,Unknown,Unknown,A,audio.wav,0
-161.76,162.007,Unknown,Unknown,B,audio.wav,0
-162.043,162.213,Unknown,Unknown,C,audio.wav,0
-162.237,162.443,Unknown,Unknown,A,audio.wav,0
-162.443,162.703,Unknown,Unknown,B,audio.wav,0
-162.823,163.057,Unknown,Unknown,A,audio.wav,0
-163.06,163.303,Unknown,Unknown,B,audio.wav,0
-163.345,163.53,Unknown,Unknown,A,audio.wav,0
-163.525,163.805,Unknown,Unknown,B,audio.wav,0
-164.607,164.797,Unknown,Unknown,U,audio.wav,0
-164.83,165.01,Unknown,Unknown,A,audio.wav,0
-165.017,165.263,Unknown,Unknown,B,audio.wav,0
-165.29,165.487,Unknown,Unknown,C,audio.wav,0
-165.487,165.723,Unknown,Unknown,B,audio.wav,0
-167.317,167.507,Unknown,Unknown,C,audio.wav,0
-169.47,169.633,Unknown,Unknown,U,audio.wav,0
-170.007,170.197,Unknown,Unknown,U,audio.wav,0
-172.017,172.197,Unknown,Unknown,U,audio.wav,0
-172.237,172.423,Unknown,Unknown,U,audio.wav,0
-172.937,173.11,Unknown,Unknown,U,audio.wav,0
-174.607,174.793,Unknown,Unknown,U,audio.wav,0
-175.563,175.757,Unknown,Unknown,U,audio.wav,0
-176.11,176.247,Unknown,Unknown,U,audio.wav,0
-177.017,177.213,Unknown,Unknown,U,audio.wav,0
-179.397,179.587,Unknown,Unknown,U,audio.wav,0
-179.873,180.053,Unknown,Unknown,U,audio.wav,0
-180.627,180.81,Unknown,Unknown,U,audio.wav,0
-182.127,182.307,Unknown,Unknown,U,audio.wav,0
-182.973,183.133,Unknown,Unknown,U,audio.wav,0
-186.76,186.94,Unknown,Unknown,U,audio.wav,0
-189.253,189.433,Unknown,Unknown,U,audio.wav,0
-189.573,189.673,Unknown,Unknown,U,audio.wav,0
-189.703,189.87,Unknown,Unknown,A,audio.wav,0
-189.87,190.115,Unknown,Unknown,B,audio.wav,0
-190.17,190.333,Unknown,Unknown,A,audio.wav,0
-190.333,190.58,Unknown,Unknown,B,audio.wav,0
-190.613,190.797,Unknown,Unknown,C,audio.wav,0
-190.797,191.023,Unknown,Unknown,B,audio.wav,0
-191.023,191.263,Unknown,Unknown,B,audio.wav,0
-191.33,191.513,Unknown,Unknown,A,audio.wav,0
-191.513,191.753,Unknown,Unknown,B,audio.wav,0
-191.827,192.0,Unknown,Unknown,A,audio.wav,0
-192.0,192.253,Unknown,Unknown,B,audio.wav,0
-192.347,192.523,Unknown,Unknown,A,audio.wav,0
-192.523,192.773,Unknown,Unknown,B,audio.wav,0
-192.843,193.043,Unknown,Unknown,C,audio.wav,0
-193.043,193.297,Unknown,Unknown,B,audio.wav,0
-193.33,193.507,Unknown,Unknown,C,audio.wav,0
-193.517,193.743,Unknown,Unknown,B,audio.wav,0
-193.747,194.0,Unknown,Unknown,B,audio.wav,0
-194.547,194.653,Unknown,Unknown,U,audio.wav,0
-199.973,200.13,Unknown,Unknown,U,audio.wav,0
-200.163,200.253,Unknown,Unknown,U,audio.wav,0
-200.267,200.443,Unknown,Unknown,A,audio.wav,0
-200.443,200.677,Unknown,Unknown,B,audio.wav,0
-200.713,200.887,Unknown,Unknown,C,audio.wav,0
-200.893,201.12,Unknown,Unknown,B,audio.wav,0
-201.117,201.363,Unknown,Unknown,B,audio.wav,0
-201.397,201.583,Unknown,Unknown,C,audio.wav,0
-201.587,201.833,Unknown,Unknown,B,audio.wav,0
-201.857,202.037,Unknown,Unknown,C,audio.wav,0
-202.04,202.273,Unknown,Unknown,B,audio.wav,0
-202.273,202.517,Unknown,Unknown,B,audio.wav,0
-202.577,202.743,Unknown,Unknown,C,audio.wav,0
-202.74,202.997,Unknown,Unknown,B,audio.wav,0
-203.053,203.243,Unknown,Unknown,C,audio.wav,0
-203.243,203.503,Unknown,Unknown,B,audio.wav,0
-203.663,203.81,Unknown,Unknown,C,audio.wav,0
-203.827,204.04,Unknown,Unknown,C,audio.wav,0
-204.103,204.293,Unknown,Unknown,C,audio.wav,0
-204.3,204.52,Unknown,Unknown,B,audio.wav,0
-204.52,204.77,Unknown,Unknown,B,audio.wav,0
-204.853,205.03,Unknown,Unknown,A,audio.wav,0
-205.03,205.303,Unknown,Unknown,B,audio.wav,0
+0.0,0.121815945,zebra finch,bird1,U,audio.wav,0
+0.178038688,0.271743261,zebra finch,bird1,U,audio.wav,0
+0.290484176,0.393559206,zebra finch,bird1,U,audio.wav,0
+0.440411492,0.599709266,zebra finch,bird1,A,audio.wav,0
+0.599709266,0.862082069,zebra finch,bird1,B,audio.wav,0
+0.880822984,1.077602587,zebra finch,bird1,C,audio.wav,0
+1.143195788,1.311864019,zebra finch,bird1,A,audio.wav,0
+1.302493561,1.564866365,zebra finch,bird1,B,audio.wav,0
+1.864720998,1.967796028,zebra finch,bird1,U,audio.wav,0
+2.005277857,2.117723344,zebra finch,bird1,U,audio.wav,0
+2.436318892,2.548764379,zebra finch,bird1,U,audio.wav,0
+2.698691696,2.773655354,zebra finch,bird1,U,audio.wav,0
+2.839248555,2.989175871,zebra finch,bird1,A,audio.wav,0
+2.998546328,3.223437303,zebra finch,bird1,B,audio.wav,0
+3.23280776,3.43895782,zebra finch,bird1,C,audio.wav,0
+3.495180564,3.663848795,zebra finch,bird1,A,audio.wav,0
+3.68258971,3.926221599,zebra finch,bird1,B,audio.wav,0
+4.029296629,4.254187603,zebra finch,bird1,C,audio.wav,0
+4.329151262,4.441596749,zebra finch,bird1,U,audio.wav,0
+4.479078578,4.647746809,zebra finch,bird1,A,audio.wav,0
+4.629005895,4.891378698,zebra finch,bird1,B,audio.wav,0
+4.928860527,5.116269673,zebra finch,bird1,C,audio.wav,0
+5.715978939,5.828424426,zebra finch,bird1,U,audio.wav,0
+5.865906255,5.9877222,zebra finch,bird1,U,audio.wav,0
+6.015833571,6.221983632,zebra finch,bird1,A,audio.wav,0
+6.212613174,6.50309735,zebra finch,bird1,B,audio.wav,0
+8.39592972,8.517745664,zebra finch,bird1,U,audio.wav,0
+8.752007096,8.864452583,zebra finch,bird1,U,audio.wav,0
+8.91130487,8.986268528,zebra finch,bird1,U,audio.wav,0
+9.070602644,9.248641332,zebra finch,bird1,A,audio.wav,0
+9.248641332,9.501643678,zebra finch,bird1,B,audio.wav,0
+9.520384593,9.726534653,zebra finch,bird1,C,audio.wav,0
+9.764016482,9.951425628,zebra finch,bird1,C,audio.wav,0
+10.00764837,10.21379843,zebra finch,bird1,A,audio.wav,0
+10.19505752,10.47617124,zebra finch,bird1,B,audio.wav,0
+10.71980312,10.89784181,zebra finch,bird1,A,audio.wav,0
+10.88847136,11.15084416,zebra finch,bird1,B,audio.wav,0
+11.18832599,11.39447605,zebra finch,bird1,C,audio.wav,0
+11.44132833,11.62873748,zebra finch,bird1,A,audio.wav,0
+11.61936702,11.88173983,zebra finch,bird1,B,audio.wav,0
+11.94733303,12.172224,zebra finch,bird1,C,audio.wav,0
+12.57515366,12.69696961,zebra finch,bird1,U,audio.wav,0
+12.73445144,12.91249013,zebra finch,bird1,A,audio.wav,0
+12.91249013,13.17486293,zebra finch,bird1,B,audio.wav,0
+13.28730842,13.60590397,zebra finch,bird1,A,audio.wav,0
+13.75583128,13.84953585,zebra finch,bird1,U,audio.wav,0
+13.86827677,14.07442683,zebra finch,bird1,A,audio.wav,0
+14.06505637,14.33679963,zebra finch,bird1,B,audio.wav,0
+14.33679963,14.54294969,zebra finch,bird1,C,audio.wav,0
+14.59917244,14.8053225,zebra finch,bird1,C,audio.wav,0
+16.753197278911564,16.816077472911566,zebra finch,bird1,U,audio.wav,0
+16.839657544911564,16.933977835911563,zebra finch,bird1,U,audio.wav,0
+16.957557908911564,17.138338465911563,zebra finch,bird1,A,audio.wav,0
+17.138338465911563,17.381999216911563,zebra finch,bird1,B,audio.wav,0
+17.405579289911564,17.609939918911564,zebra finch,bird1,C,audio.wav,0
+17.633519991911562,17.806440524911565,zebra finch,bird1,A,audio.wav,0
+17.822160573911564,18.057961299911565,zebra finch,bird1,B,audio.wav,0
+18.136561542911565,18.301622050911565,zebra finch,bird1,A,audio.wav,0
+18.325202123911563,18.57672289891157,zebra finch,bird1,B,audio.wav,0
+18.671043189911565,18.851823746911563,zebra finch,bird1,C,audio.wav,0
+18.875403819911565,19.056184376911563,zebra finch,bird1,C,audio.wav,0
+19.095484497911563,19.284125078911565,zebra finch,bird1,A,audio.wav,0
+19.284125078911565,19.535645854911564,zebra finch,bird1,B,audio.wav,0
+19.614246096911565,19.795026653911563,zebra finch,bird1,A,audio.wav,0
+19.818606726911565,20.04654742891157,zebra finch,bird1,B,audio.wav,0
+20.140867719911565,20.33736832491157,zebra finch,bird1,A,audio.wav,0
+20.33736832491157,20.58102907591157,zebra finch,bird1,B,audio.wav,0
+20.62032919791157,20.808969778911564,zebra finch,bird1,C,audio.wav,0
+20.887570020911564,21.07621060291157,zebra finch,bird1,A,audio.wav,0
+21.07621060291157,21.312011328911563,zebra finch,bird1,B,audio.wav,0
+21.382751546911564,21.516371958911563,zebra finch,bird1,C,audio.wav,0
+21.547812055911564,21.736452636911565,zebra finch,bird1,C,audio.wav,0
+21.76789273391157,21.97225336391156,zebra finch,bird1,A,audio.wav,0
+21.987973412911565,22.22377413891157,zebra finch,bird1,B,audio.wav,0
+23.717178741911564,23.787918959911565,zebra finch,bird1,U,audio.wav,0
+23.93725941991156,24.015859662911566,zebra finch,bird1,U,audio.wav,0
+24.039439734911564,24.14162004991157,zebra finch,bird1,U,audio.wav,0
+24.196640219911565,24.353840703911565,zebra finch,bird1,A,audio.wav,0
+24.345980679911563,24.581781406911563,zebra finch,bird1,B,audio.wav,0
+24.644661600911565,24.833302181911563,zebra finch,bird1,C,audio.wav,0
+24.864742278911564,25.021942762911564,zebra finch,bird1,A,audio.wav,0
+25.037662811911567,25.273463538911564,zebra finch,bird1,B,audio.wav,0
+25.304903634911565,25.50140424091156,zebra finch,bird1,C,audio.wav,0
+25.611444579911563,25.78436511291157,zebra finch,bird1,A,audio.wav,0
+25.792225136911565,26.043745912911564,zebra finch,bird1,B,audio.wav,0
+27.87513155891156,27.95373179891156,zebra finch,bird1,U,audio.wav,0
+28.60611380891157,28.763314298911563,zebra finch,bird1,U,audio.wav,0
+29.21919569891156,29.407836278911564,zebra finch,bird1,C,audio.wav,0
+29.439276378911565,29.612196908911564,zebra finch,bird1,A,audio.wav,0
+29.627916958911563,29.863717688911564,zebra finch,bird1,B,audio.wav,0
+29.91087782891157,30.091658388911565,zebra finch,bird1,C,audio.wav,0
+30.115238458911563,30.28815898891156,zebra finch,bird1,C,audio.wav,0
+30.413919378911565,30.586839918911565,zebra finch,bird1,A,audio.wav,0
+30.586839918911565,30.822640638911565,zebra finch,bird1,B,audio.wav,0
+30.854080738911563,31.074161418911565,zebra finch,bird1,C,audio.wav,0
+31.121321558911564,31.27852204891156,zebra finch,bird1,A,audio.wav,0
+31.294242098911564,31.545762868911567,zebra finch,bird1,B,audio.wav,0
+32.11954463891156,32.28460514891157,zebra finch,bird1,A,audio.wav,0
+32.28460514891157,32.54398594891156,zebra finch,bird1,B,audio.wav,0
+32.59900611891156,32.77192664891156,zebra finch,bird1,A,audio.wav,0
+32.79550671891157,33.039167468911565,zebra finch,bird1,B,audio.wav,0
+33.13348775891156,33.329988368911565,zebra finch,bird1,C,audio.wav,0
+35.29778693643537,35.365583253435375,zebra finch,bird1,U,audio.wav,0
+36.80604573443537,36.888590419435374,zebra finch,bird1,U,audio.wav,0
+37.023663541435376,37.15873666243537,zebra finch,bird1,U,audio.wav,0
+37.24881427143537,37.339209360435376,zebra finch,bird1,U,audio.wav,0
+37.57273000643537,37.663125095435376,zebra finch,bird1,U,audio.wav,0
+38.047304223435376,38.145232236435376,zebra finch,bird1,U,audio.wav,0
+39.12451236543537,39.229973302435376,zebra finch,bird1,U,audio.wav,0
+40.63863010443537,40.804354434435375,zebra finch,bird1,U,audio.wav,0
+41.278928650435375,41.391922511435375,zebra finch,bird1,U,audio.wav,0
+42.047286906435374,42.15274784343537,zebra finch,bird1,U,audio.wav,0
+42.258208780435375,42.33353802143537,zebra finch,bird1,U,audio.wav,0
+42.408867261435375,42.49926235043537,zebra finch,bird1,U,audio.wav,0
+42.529394047435375,42.60472328743538,zebra finch,bird1,U,audio.wav,0
+42.78551346543537,42.88344147843537,zebra finch,bird1,U,audio.wav,0
+43.049165808435376,43.132027972435374,zebra finch,bird1,U,audio.wav,0
+43.651799733435375,43.77985944343537,zebra finch,bird1,U,audio.wav,0
+45.55,45.667,zebra finch,bird1,U,audio.wav,0
+46.287,46.383,zebra finch,bird1,U,audio.wav,0
+46.417,46.513,zebra finch,bird1,U,audio.wav,0
+46.553,46.703,zebra finch,bird1,A,audio.wav,0
+46.723,46.96,zebra finch,bird1,B,audio.wav,0
+46.99,47.2,zebra finch,bird1,C,audio.wav,0
+47.217,47.387,zebra finch,bird1,A,audio.wav,0
+47.393,47.633,zebra finch,bird1,B,audio.wav,0
+47.813,47.973,zebra finch,bird1,A,audio.wav,0
+47.977,48.22,zebra finch,bird1,B,audio.wav,0
+48.257,48.46,zebra finch,bird1,C,audio.wav,0
+48.517,48.68,zebra finch,bird1,A,audio.wav,0
+48.69,48.92,zebra finch,bird1,B,audio.wav,0
+48.96,49.167,zebra finch,bird1,C,audio.wav,0
+49.27,49.37,zebra finch,bird1,U,audio.wav,0
+49.407,49.497,zebra finch,bird1,U,audio.wav,0
+49.657,49.753,zebra finch,bird1,U,audio.wav,0
+51.717,51.823,zebra finch,bird1,U,audio.wav,0
+52.583,52.717,zebra finch,bird1,U,audio.wav,0
+53.306,53.376,zebra finch,bird1,U,audio.wav,0
+53.45,53.537,zebra finch,bird1,U,audio.wav,0
+53.56,53.657,zebra finch,bird1,U,audio.wav,0
+53.677,53.85,zebra finch,bird1,A,audio.wav,0
+53.857,54.093,zebra finch,bird1,B,audio.wav,0
+54.117,54.323,zebra finch,bird1,C,audio.wav,0
+54.35,54.517,zebra finch,bird1,A,audio.wav,0
+54.517,54.76,zebra finch,bird1,B,audio.wav,0
+54.797,55.01,zebra finch,bird1,C,audio.wav,0
+55.04,55.217,zebra finch,bird1,A,audio.wav,0
+55.233,55.477,zebra finch,bird1,B,audio.wav,0
+55.537,55.717,zebra finch,bird1,A,audio.wav,0
+55.717,55.977,zebra finch,bird1,B,audio.wav,0
+56.03,56.217,zebra finch,bird1,A,audio.wav,0
+56.227,56.483,zebra finch,bird1,B,audio.wav,0
+58.603,58.72,zebra finch,bird1,U,audio.wav,0
+58.88,58.98,zebra finch,bird1,U,audio.wav,0
+59.017,59.217,zebra finch,bird1,A,audio.wav,0
+59.243,59.423,zebra finch,bird1,A,audio.wav,0
+59.427,59.667,zebra finch,bird1,B,audio.wav,0
+59.703,59.92,zebra finch,bird1,C,audio.wav,0
+60.167,60.343,zebra finch,bird1,A,audio.wav,0
+60.343,60.59,zebra finch,bird1,B,audio.wav,0
+60.63,60.837,zebra finch,bird1,C,audio.wav,0
+60.873,61.043,zebra finch,bird1,A,audio.wav,0
+61.047,61.297,zebra finch,bird1,B,audio.wav,0
+61.357,61.573,zebra finch,bird1,C,audio.wav,0
+61.607,61.787,zebra finch,bird1,A,audio.wav,0
+61.793,62.043,zebra finch,bird1,B,audio.wav,0
+62.083,62.283,zebra finch,bird1,C,audio.wav,0
+62.38,62.56,zebra finch,bird1,C,audio.wav,0
+62.633,62.827,zebra finch,bird1,C,audio.wav,0
+62.857,63.04,zebra finch,bird1,A,audio.wav,0
+63.05,63.307,zebra finch,bird1,B,audio.wav,0
+64.183,64.363,zebra finch,bird1,U,audio.wav,0
+64.437,64.527,zebra finch,bird1,C,audio.wav,0
+64.56,64.737,zebra finch,bird1,A,audio.wav,0
+64.74,64.993,zebra finch,bird1,B,audio.wav,0
+65.057,65.28,zebra finch,bird1,C,audio.wav,0
+65.307,65.477,zebra finch,bird1,A,audio.wav,0
+65.483,65.743,zebra finch,bird1,B,audio.wav,0
+65.803,66.017,zebra finch,bird1,C,audio.wav,0
+66.323,66.54,zebra finch,bird1,C,audio.wav,0
+66.623,66.84,zebra finch,bird1,C,audio.wav,0
+68.883,69.063,zebra finch,bird1,C,audio.wav,0
+69.693,69.88,zebra finch,bird1,C,audio.wav,0
+70.587,70.69,zebra finch,bird1,U,audio.wav,0
+70.703,70.88,zebra finch,bird1,A,audio.wav,0
+70.88,71.103,zebra finch,bird1,B,audio.wav,0
+71.14,71.32,zebra finch,bird1,C,audio.wav,0
+71.323,71.537,zebra finch,bird1,A,audio.wav,0
+71.54,71.777,zebra finch,bird1,B,audio.wav,0
+71.827,72.027,zebra finch,bird1,C,audio.wav,0
+72.027,72.233,zebra finch,bird1,B,audio.wav,0
+72.243,72.483,zebra finch,bird1,B,audio.wav,0
+73.023,73.21,zebra finch,bird1,U,audio.wav,0
+73.243,73.42,zebra finch,bird1,A,audio.wav,0
+73.42,73.663,zebra finch,bird1,B,audio.wav,0
+73.693,73.88,zebra finch,bird1,C,audio.wav,0
+73.883,74.1,zebra finch,bird1,A,audio.wav,0
+74.103,74.35,zebra finch,bird1,B,audio.wav,0
+74.433,74.533,zebra finch,bird1,U,audio.wav,0
+74.557,74.73,zebra finch,bird1,A,audio.wav,0
+74.74,74.983,zebra finch,bird1,B,audio.wav,0
+75.023,75.23,zebra finch,bird1,C,audio.wav,0
+75.257,75.433,zebra finch,bird1,A,audio.wav,0
+75.44,75.687,zebra finch,bird1,B,audio.wav,0
+75.727,75.933,zebra finch,bird1,C,audio.wav,0
+75.957,76.147,zebra finch,bird1,A,audio.wav,0
+76.163,76.3,zebra finch,bird1,B,audio.wav,0
+79.5,79.59,zebra finch,bird1,U,audio.wav,0
+79.617,79.707,zebra finch,bird1,U,audio.wav,0
+79.73,79.91,zebra finch,bird1,A,audio.wav,0
+79.91,80.15,zebra finch,bird1,B,audio.wav,0
+80.18,80.367,zebra finch,bird1,C,audio.wav,0
+80.365,80.435,zebra finch,bird1,C,audio.wav,0
+80.413,80.597,zebra finch,bird1,A,audio.wav,0
+80.603,80.86,zebra finch,bird1,B,audio.wav,0
+86.27,86.453,zebra finch,bird1,U,audio.wav,0
+87.067,87.247,zebra finch,bird1,U,audio.wav,0
+87.277,87.47,zebra finch,bird1,U,audio.wav,0
+89.117,89.31,zebra finch,bird1,U,audio.wav,0
+90.02,90.1,zebra finch,bird1,U,audio.wav,0
+90.12,90.213,zebra finch,bird1,U,audio.wav,0
+90.223,90.393,zebra finch,bird1,A,audio.wav,0
+90.393,90.637,zebra finch,bird1,B,audio.wav,0
+90.66,90.847,zebra finch,bird1,C,audio.wav,0
+90.853,91.05,zebra finch,bird1,A,audio.wav,0
+91.05,91.293,zebra finch,bird1,B,audio.wav,0
+91.323,91.523,zebra finch,bird1,C,audio.wav,0
+91.54,91.737,zebra finch,bird1,A,audio.wav,0
+91.74,91.983,zebra finch,bird1,B,audio.wav,0
+92.05,92.373,zebra finch,bird1,C,audio.wav,0
+93.93,94.103,zebra finch,bird1,U,audio.wav,0
+94.127,94.33,zebra finch,bird1,U,audio.wav,0
+96.243,96.453,zebra finch,bird1,U,audio.wav,0
+101.877,102.077,zebra finch,bird1,U,audio.wav,0
+104.023,104.233,zebra finch,bird1,U,audio.wav,0
+104.92,105.1,zebra finch,bird1,U,audio.wav,0
+105.32,105.417,zebra finch,bird1,U,audio.wav,0
+105.507,105.593,zebra finch,bird1,U,audio.wav,0
+106.05,106.217,zebra finch,bird1,C,audio.wav,0
+106.24,106.45,zebra finch,bird1,A,audio.wav,0
+106.463,106.697,zebra finch,bird1,B,audio.wav,0
+106.723,106.923,zebra finch,bird1,C,audio.wav,0
+106.927,107.133,zebra finch,bird1,A,audio.wav,0
+107.133,107.38,zebra finch,bird1,B,audio.wav,0
+107.44,107.61,zebra finch,bird1,A,audio.wav,0
+107.61,107.853,zebra finch,bird1,B,audio.wav,0
+107.88,108.07,zebra finch,bird1,C,audio.wav,0
+108.087,108.303,zebra finch,bird1,A,audio.wav,0
+108.31,108.567,zebra finch,bird1,B,audio.wav,0
+108.777,108.85,zebra finch,bird1,C,audio.wav,0
+108.873,109.057,zebra finch,bird1,A,audio.wav,0
+109.06,109.307,zebra finch,bird1,B,audio.wav,0
+109.343,109.53,zebra finch,bird1,C,audio.wav,0
+110.483,110.6,zebra finch,bird1,U,audio.wav,0
+112.063,112.24,zebra finch,bird1,U,audio.wav,0
+113.97,114.15,zebra finch,bird1,U,audio.wav,0
+116.9,117.08,zebra finch,bird1,U,audio.wav,0
+120.12,120.297,zebra finch,bird1,U,audio.wav,0
+121.04,121.143,zebra finch,bird1,U,audio.wav,0
+121.177,121.343,zebra finch,bird1,A,audio.wav,0
+121.343,121.587,zebra finch,bird1,B,audio.wav,0
+121.613,121.797,zebra finch,bird1,C,audio.wav,0
+121.803,121.863,zebra finch,bird1,A,audio.wav,0
+121.863,122.027,zebra finch,bird1,A,audio.wav,0
+122.027,122.267,zebra finch,bird1,B,audio.wav,0
+122.303,122.487,zebra finch,bird1,C,audio.wav,0
+122.487,122.58,zebra finch,bird1,A,audio.wav,0
+122.552,122.712,zebra finch,bird1,A,audio.wav,0
+122.71,122.95,zebra finch,bird1,B,audio.wav,0
+122.99,123.167,zebra finch,bird1,C,audio.wav,0
+123.168,123.228,zebra finch,bird1,A,audio.wav,0
+123.228,123.388,zebra finch,bird1,A,audio.wav,0
+123.407,123.647,zebra finch,bird1,B,audio.wav,0
+123.693,124.027,zebra finch,bird1,C,audio.wav,0
+124.047,124.23,zebra finch,bird1,C,audio.wav,0
+124.232,124.298,zebra finch,bird1,A,audio.wav,0
+124.283,124.46,zebra finch,bird1,A,audio.wav,0
+124.467,124.707,zebra finch,bird1,B,audio.wav,0
+124.76,124.947,zebra finch,bird1,A,audio.wav,0
+124.947,125.207,zebra finch,bird1,B,audio.wav,0
+126.007,126.193,zebra finch,bird1,U,audio.wav,0
+126.243,126.34,zebra finch,bird1,U,audio.wav,0
+126.447,126.537,zebra finch,bird1,U,audio.wav,0
+126.563,126.74,zebra finch,bird1,A,audio.wav,0
+126.75,126.987,zebra finch,bird1,B,audio.wav,0
+127.017,127.213,zebra finch,bird1,C,audio.wav,0
+127.238,127.438,zebra finch,bird1,A,audio.wav,0
+127.45,127.69,zebra finch,bird1,B,audio.wav,0
+127.747,127.923,zebra finch,bird1,A,audio.wav,0
+127.933,128.177,zebra finch,bird1,B,audio.wav,0
+128.3,128.47,zebra finch,bird1,A,audio.wav,0
+128.477,128.73,zebra finch,bird1,B,audio.wav,0
+136.047,136.213,zebra finch,bird1,U,audio.wav,0
+136.34,136.42,zebra finch,bird1,U,audio.wav,0
+136.46,136.623,zebra finch,bird1,A,audio.wav,0
+136.64,136.86,zebra finch,bird1,B,audio.wav,0
+136.91,137.103,zebra finch,bird1,C,audio.wav,0
+137.107,137.303,zebra finch,bird1,A,audio.wav,0
+137.307,137.547,zebra finch,bird1,B,audio.wav,0
+137.61,137.72,zebra finch,bird1,C,audio.wav,0
+137.727,137.963,zebra finch,bird1,B,audio.wav,0
+138.017,138.19,zebra finch,bird1,A,audio.wav,0
+138.198,138.438,zebra finch,bird1,B,audio.wav,0
+138.55,138.807,zebra finch,bird1,C,audio.wav,0
+138.87,139.047,zebra finch,bird1,A,audio.wav,0
+139.053,139.293,zebra finch,bird1,B,audio.wav,0
+139.367,139.54,zebra finch,bird1,A,audio.wav,0
+139.547,139.793,zebra finch,bird1,B,audio.wav,0
+139.9,140.073,zebra finch,bird1,A,audio.wav,0
+140.083,140.347,zebra finch,bird1,B,audio.wav,0
+142.2,142.317,zebra finch,bird1,U,audio.wav,0
+147.62,147.803,zebra finch,bird1,U,audio.wav,0
+148.407,148.597,zebra finch,bird1,C,audio.wav,0
+149.413,149.597,zebra finch,bird1,C,audio.wav,0
+150.34,150.52,zebra finch,bird1,C,audio.wav,0
+150.577,150.663,zebra finch,bird1,U,audio.wav,0
+150.683,150.86,zebra finch,bird1,A,audio.wav,0
+150.863,151.097,zebra finch,bird1,B,audio.wav,0
+151.137,151.31,zebra finch,bird1,C,audio.wav,0
+151.317,151.523,zebra finch,bird1,A,audio.wav,0
+151.53,151.777,zebra finch,bird1,B,audio.wav,0
+151.8,152.003,zebra finch,bird1,C,audio.wav,0
+152.04,152.217,zebra finch,bird1,A,audio.wav,0
+152.223,152.47,zebra finch,bird1,B,audio.wav,0
+153.863,154.053,zebra finch,bird1,C,audio.wav,0
+154.913,155.097,zebra finch,bird1,C,audio.wav,0
+155.933,156.113,zebra finch,bird1,U,audio.wav,0
+157.257,157.433,zebra finch,bird1,U,audio.wav,0
+157.55,157.747,zebra finch,bird1,U,audio.wav,0
+158.51,158.613,zebra finch,bird1,U,audio.wav,0
+158.647,158.753,zebra finch,bird1,U,audio.wav,0
+158.787,158.963,zebra finch,bird1,A,audio.wav,0
+158.967,159.207,zebra finch,bird1,B,audio.wav,0
+159.237,159.45,zebra finch,bird1,C,audio.wav,0
+159.687,159.773,zebra finch,bird1,U,audio.wav,0
+159.787,159.967,zebra finch,bird1,A,audio.wav,0
+159.973,160.217,zebra finch,bird1,B,audio.wav,0
+160.243,160.433,zebra finch,bird1,C,audio.wav,0
+160.44,160.637,zebra finch,bird1,A,audio.wav,0
+160.64,160.893,zebra finch,bird1,B,audio.wav,0
+160.93,161.143,zebra finch,bird1,C,audio.wav,0
+161.443,161.55,zebra finch,bird1,U,audio.wav,0
+161.577,161.75,zebra finch,bird1,A,audio.wav,0
+161.767,162.0,zebra finch,bird1,B,audio.wav,0
+162.043,162.217,zebra finch,bird1,C,audio.wav,0
+162.233,162.44,zebra finch,bird1,A,audio.wav,0
+162.453,162.7,zebra finch,bird1,B,audio.wav,0
+162.82,163.053,zebra finch,bird1,C,audio.wav,0
+163.053,163.293,zebra finch,bird1,B,audio.wav,0
+163.343,163.527,zebra finch,bird1,A,audio.wav,0
+163.53,163.797,zebra finch,bird1,B,audio.wav,0
+164.61,164.78,zebra finch,bird1,C,audio.wav,0
+164.823,165.007,zebra finch,bird1,A,audio.wav,0
+165.01,165.257,zebra finch,bird1,B,audio.wav,0
+165.29,165.487,zebra finch,bird1,C,audio.wav,0
+165.49,165.72,zebra finch,bird1,B,audio.wav,0
+167.32,167.51,zebra finch,bird1,C,audio.wav,0
+169.467,169.63,zebra finch,bird1,U,audio.wav,0
+170.013,170.207,zebra finch,bird1,U,audio.wav,0
+172.023,172.193,zebra finch,bird1,U,audio.wav,0
+172.247,172.417,zebra finch,bird1,U,audio.wav,0
+172.943,173.127,zebra finch,bird1,U,audio.wav,0
+174.607,174.793,zebra finch,bird1,U,audio.wav,0
+175.577,175.757,zebra finch,bird1,U,audio.wav,0
+176.12,176.247,zebra finch,bird1,U,audio.wav,0
+177.027,177.217,zebra finch,bird1,U,audio.wav,0
+179.407,179.587,zebra finch,bird1,U,audio.wav,0
+179.883,180.057,zebra finch,bird1,U,audio.wav,0
+180.64,180.817,zebra finch,bird1,U,audio.wav,0
+182.133,182.317,zebra finch,bird1,U,audio.wav,0
+182.983,183.14,zebra finch,bird1,U,audio.wav,0
+186.77,186.947,zebra finch,bird1,U,audio.wav,0
+189.26,189.427,zebra finch,bird1,U,audio.wav,0
+189.577,189.663,zebra finch,bird1,U,audio.wav,0
+189.695,189.865,zebra finch,bird1,A,audio.wav,0
+189.87,190.115,zebra finch,bird1,B,audio.wav,0
+190.167,190.33,zebra finch,bird1,C,audio.wav,0
+190.333,190.577,zebra finch,bird1,B,audio.wav,0
+190.613,190.797,zebra finch,bird1,C,audio.wav,0
+190.803,191.013,zebra finch,bird1,A,audio.wav,0
+191.02,191.263,zebra finch,bird1,B,audio.wav,0
+191.327,191.507,zebra finch,bird1,A,audio.wav,0
+191.513,191.753,zebra finch,bird1,B,audio.wav,0
+191.817,191.997,zebra finch,bird1,A,audio.wav,0
+192.0,192.253,zebra finch,bird1,B,audio.wav,0
+192.347,192.517,zebra finch,bird1,A,audio.wav,0
+192.527,192.773,zebra finch,bird1,B,audio.wav,0
+192.843,193.033,zebra finch,bird1,C,audio.wav,0
+193.04,193.287,zebra finch,bird1,B,audio.wav,0
+193.33,193.503,zebra finch,bird1,C,audio.wav,0
+193.517,193.743,zebra finch,bird1,A,audio.wav,0
+193.747,194.0,zebra finch,bird1,B,audio.wav,0
+194.543,194.647,zebra finch,bird1,U,audio.wav,0
+199.977,200.113,zebra finch,bird1,C,audio.wav,0
+200.16,200.24,zebra finch,bird1,U,audio.wav,0
+200.263,200.44,zebra finch,bird1,A,audio.wav,0
+200.443,200.677,zebra finch,bird1,B,audio.wav,0
+200.713,200.887,zebra finch,bird1,C,audio.wav,0
+200.91,201.113,zebra finch,bird1,A,audio.wav,0
+201.12,201.363,zebra finch,bird1,B,audio.wav,0
+201.403,201.573,zebra finch,bird1,C,audio.wav,0
+201.578,201.832,zebra finch,bird1,B,audio.wav,0
+201.867,202.033,zebra finch,bird1,C,audio.wav,0
+202.042,202.272,zebra finch,bird1,A,audio.wav,0
+202.272,202.517,zebra finch,bird1,B,audio.wav,0
+202.563,202.74,zebra finch,bird1,C,audio.wav,0
+202.743,202.997,zebra finch,bird1,B,audio.wav,0
+203.05,203.24,zebra finch,bird1,C,audio.wav,0
+203.243,203.503,zebra finch,bird1,B,audio.wav,0
+203.657,203.77,zebra finch,bird1,C,audio.wav,0
+203.787,204.017,zebra finch,bird1,C,audio.wav,0
+204.1,204.31,zebra finch,bird1,C,audio.wav,0
+204.31,204.513,zebra finch,bird1,A,audio.wav,0
+204.52,204.773,zebra finch,bird1,B,audio.wav,0
+204.847,205.027,zebra finch,bird1,A,audio.wav,0
+205.03,205.3,zebra finch,bird1,B,audio.wav,0
