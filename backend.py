@@ -22,7 +22,8 @@ from datetime import datetime, timedelta
 import time
 import threading
 from spec_utils import SpecCalConstantQ, SpecCalLogMel
-from segmentation_utils import call_segment_service
+from segmentation_utils import *
+import re
 
 # Make Flask application
 app = Flask(__name__)
@@ -187,6 +188,22 @@ def release_idle_audios( audio_dict, idle_hours ):
                 pass
             print( "Audio %s has been deleted after being idle over %f hours"%(audio_id, idle_hours) )
         time.sleep(60 * 60)  # Check every hour
+        
+def parse_clustername( cluster, cluster_separator ):
+    res = re.findall( r"^(.*?)%s(.*?)%s(.*?)$"%( cluster_separator, cluster_separator ), cluster )
+    if len(res) == 1:
+        parsed_res = {
+            "species":res[0][0],
+            "individual":res[0][1],
+            "clustername":res[0][2],
+        }
+    else:
+        parsed_res = {
+            "species":"Unknown",
+            "individual":"Unknown",
+            "clustername":"Unknown"
+        }
+    return parsed_res
     
 @app.route("/upload", methods=['POST'])
 def upload():
@@ -460,35 +477,145 @@ def get_audio_clip_for_visualization():
     audio_clip = np.clip( audio_clip, a_min = percentile_down, a_max =  percentile_up )
     return jsonify({"wav_array":audio_clip.tolist()}), 201
 
+@app.route("/list-models-available-for-finetuning", methods=['POST'])
+def list_models_available_for_finetuning():
+    global args    
+    res = requests.post( args.segmentation_service_address + "/list-models-available-for-finetuning" ).json()
+    return jsonify(res), 201
+
+@app.route("/list-models-available-for-inference", methods=['POST'])
+def list_models_available_for_inference():
+    global args    
+    res = requests.post( args.segmentation_service_address + "/list-models-available-for-inference" ).json()
+    return jsonify(res), 201
+
+@app.route("/list-models-training-in-progress", methods=['POST'])
+def list_models_being_trained():
+    global args    
+    res = requests.post( args.segmentation_service_address + "/list-models-training-in-progress" ).json()
+    return jsonify(res), 201
+
 @app.route("/get-labels", methods=['POST'])
 def get_labels():
-    global audio_dict, args
+    global audio_dict, cluster_separator, args
     
     request_info = request.json
     audio_id = request_info["audio_id"]
+    annotated_areas = request_info.get("annotated_areas",[])
+    human_labels = request_info.get("human_labels", [])
+    model_name = request_info.get("model_name", "whisperseg-base")
+    min_frequency = request_info.get( "min_frequency", None )
     
     ## update the timestamp of the audio_id
     audio_dict[audio_id]["timestamp"] = datetime.now()
-    
     audio = audio_dict[audio_id]["orig_audio"]
     sr = audio_dict[audio_id]["orig_sr"]
     
-    min_frequency = request_info.get( "min_frequency", None )
-    spec_time_step = request_info.get( "spec_time_step", None )
-    min_segment_length = request_info.get( "min_segment_length", None )
-    eps = request_info.get( "eps", None )
-    
-    prediction = call_segment_service( args.segmentation_service_address, 
-                          audio,
-                          sr,
-                          min_frequency = min_frequency,
-                          spec_time_step = spec_time_step,
-                          min_segment_length = min_segment_length,
-                          eps = eps,
-                          num_trials = 1
-                        )
-    return jsonify({"labels":prediction}), 201
+    prediction = segment_audio( args.segmentation_service_address, model_name, audio, sr, min_frequency = min_frequency, spec_time_step = None )
+    for item in prediction:
+        item.update( parse_clustername( item["cluster"], cluster_separator ) )
+        del item["cluster"]
+        
+    human_labels_in_annotated_areas = []
+    for item in human_labels:
+        is_in_annotated_area = False
+        for area in annotated_areas:
+            if item["onset"] < area["offset"] and item["offset"] > area["onset"]:
+                is_in_annotated_area = True
+                break
+        if is_in_annotated_area:
+            human_labels_in_annotated_areas.append({
+                "onset":item["onset"],
+                "offset":item["offset"],
+                "species":item["species"],
+                "individual":item["individual"],
+                "clustername":item["clustername"]
+            })
+            
+    prediction_not_in_annotated_areas = []
+    for item in prediction:
+        is_in_annotated_area = False
+        for area in annotated_areas:
+            if item["onset"] < area["offset"] and item["offset"] > area["onset"]:
+                is_in_annotated_area = True
+                break
+        if not is_in_annotated_area:
+            prediction_not_in_annotated_areas.append(item)
+            
+    final_prediction = human_labels_in_annotated_areas + prediction_not_in_annotated_areas
+    final_prediction.sort( key = lambda x:x["onset"] )
+        
+    return jsonify({"labels":final_prediction}), 201
 
+
+@app.route("/finetune-whisperseg", methods=['POST'])
+def finetune_whisperseg():
+    global audio_dict, cluster_separator, args
+    request_info = request.json
+    audio_id = request_info["audio_id"]
+    annotated_areas = request_info["annotated_areas"]
+    human_labels = request_info["human_labels"]
+    new_model_name = request_info["new_model_name"]
+    inital_model_name = request_info["inital_model_name"]
+    min_frequency = request_info.get( "min_frequency", None )
+    
+    ## update the timestamp of the audio_id
+    audio_dict[audio_id]["timestamp"] = datetime.now()
+    audio = audio_dict[audio_id]["orig_audio"]
+    sr = audio_dict[audio_id]["orig_sr"]
+        
+    training_dataset_files = []
+    for count, area in enumerate(annotated_areas):
+        area_onset = area["onset"]
+        area_offset = area["offset"]
+        audio_clip = audio[ int( area_onset * sr ):int( area_offset * sr ) ] 
+        if len(audio_clip) == 0:
+            continue
+        ## compute the actual area_offset
+        area_offset = area_onset + len( audio_clip ) / sr
+        
+        human_labels_with_in_area = []
+        for item in human_labels:
+            if item["onset"] < area_offset and item["offset"] > area_onset and item["offset"] > item["onset"]:
+                human_labels_with_in_area.append(
+                    {
+                        "onset":max(0, item["onset"] - area_onset),
+                        "offset":min( area_offset - area_onset, item["offset"] - area_onset ),
+                        "cluster": cluster_separator.join( [item["species"], item["individual"], item["clustername"]] ) 
+                    }
+                )
+        human_labels_with_in_area.sort( key = lambda x:x["onset"] )
+        label_clip = {
+            "onset":[ item["onset"] for item in human_labels_with_in_area],
+            "offset":[ item["offset"] for item in human_labels_with_in_area],
+            "cluster":[ item["cluster"] for item in human_labels_with_in_area]
+        }
+        if isinstance( min_frequency, int ):
+            label_clip["min_frequency"] = min_frequency
+        
+        audio_fname = "%s_%d.wav"%( audio_id, count )
+        label_fname = "%s_%d.json"%( audio_id, count )
+        buffer = io.BytesIO()
+        sf.write(buffer, audio_clip, samplerate=sr, format='WAV')
+        buffer.seek(0)
+        training_dataset_files.append( ( audio_fname, buffer.read() ) )
+        buffer.close()
+        
+        buffer = io.BytesIO()
+        buffer.write(json.dumps(label_clip).encode('utf-8'))
+        buffer.seek(0)
+        training_dataset_files.append( ( label_fname, buffer.read() ) )
+        buffer.close()
+        
+    if len(training_dataset_files) == 0:
+        return jsonify({"error":"No valid training data specified. Re-check the annotated areas."}), 400
+    
+    response, status_code = submit_training_request( args.segmentation_service_address, new_model_name, inital_model_name, training_dataset_files, num_epochs = 3 )
+    status_code = 201 if status_code != 400 else 400
+    
+    return jsonify( response ), status_code
+    
+    
 @app.route("/post-annotations", methods=['POST'])
 def post_annotations():
     global args
@@ -522,7 +649,7 @@ def release_audio_given_ids():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-flask_port", help="The port of the flask app.", default=8050, type=int)
-    parser.add_argument("-segmentation_service_address", help="The address to the WhisperSeg segmentation API.", default="https://07bd-130-60-24-13.ngrok-free.app/segment")
+    parser.add_argument("-segmentation_service_address", help="The address to the WhisperSeg segmentation API.", default="https://0f08-130-60-61-9.ngrok-free.app/")
     parser.add_argument("-dataplatform_evolving_language_post_annotation_service_address", help="The address to the dataplatform evolving language (Used for post annotations).", default="https://dataplatform.evolvinglanguage.ch/animal_call/annotations/")
     args = parser.parse_args()
     
@@ -530,6 +657,7 @@ if __name__ == '__main__':
     num_spec_columns = 1000
     n_bins = 200
     idle_hours = 48
+    cluster_separator = "<==SEPARATOR==>"
     
     thread = threading.Thread(target=release_idle_audios, args=(audio_dict, idle_hours))
     thread.daemon = True
