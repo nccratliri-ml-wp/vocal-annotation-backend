@@ -24,6 +24,7 @@ import threading
 from spec_utils import SpecCalConstantQ, SpecCalLogMel
 from segmentation_utils import *
 import re
+import zipfile
 
 # Make Flask application
 app = Flask(__name__)
@@ -563,54 +564,61 @@ def finetune_whisperseg():
     audio_dict[audio_id]["timestamp"] = datetime.now()
     audio = audio_dict[audio_id]["orig_audio"]
     sr = audio_dict[audio_id]["orig_sr"]
+    
+    memory_file = io.BytesIO()
+    with zipfile.ZipFile(memory_file, 'w', compression=zipfile.ZIP_STORED) as zipf:
+        file_count = 0
+        for count, area in enumerate(annotated_areas):
+            area_onset = area["onset"]
+            area_offset = area["offset"]
+            audio_clip = audio[ int( area_onset * sr ):int( area_offset * sr ) ] 
+            if len(audio_clip) == 0:
+                continue
+            ## compute the actual area_offset
+            area_offset = area_onset + len( audio_clip ) / sr
+            
+            human_labels_with_in_area = []
+            for item in human_labels:
+                if item["onset"] < area_offset and item["offset"] > area_onset and item["offset"] > item["onset"]:
+                    human_labels_with_in_area.append(
+                        {
+                            "onset":max(0, item["onset"] - area_onset),
+                            "offset":min( area_offset - area_onset, item["offset"] - area_onset ),
+                            "cluster": cluster_separator.join( [item["species"], item["individual"], item["clustername"]] ) 
+                        }
+                    )
+            human_labels_with_in_area.sort( key = lambda x:x["onset"] )
+            label_clip = {
+                "onset":[ item["onset"] for item in human_labels_with_in_area],
+                "offset":[ item["offset"] for item in human_labels_with_in_area],
+                "cluster":[ item["cluster"] for item in human_labels_with_in_area]
+            }
+            if isinstance( min_frequency, int ):
+                label_clip["min_frequency"] = min_frequency
+            
+            audio_fname = "%s_%d.wav"%( audio_id, count )
+            label_fname = "%s_%d.json"%( audio_id, count )
+            buffer = io.BytesIO()
+            sf.write(buffer, audio_clip, samplerate=sr, format='WAV')
+            buffer.seek(0)
+            zipf.writestr(audio_fname, buffer.read())
+            buffer.close()
+            
+            buffer = io.BytesIO()
+            buffer.write(json.dumps(label_clip).encode('utf-8'))
+            buffer.seek(0)
+            zipf.writestr(label_fname, buffer.read())
+            buffer.close()
+            
+            file_count += 1
+            
+    ## This is necessary!
+    memory_file.seek(0)
         
-    training_dataset_files = []
-    for count, area in enumerate(annotated_areas):
-        area_onset = area["onset"]
-        area_offset = area["offset"]
-        audio_clip = audio[ int( area_onset * sr ):int( area_offset * sr ) ] 
-        if len(audio_clip) == 0:
-            continue
-        ## compute the actual area_offset
-        area_offset = area_onset + len( audio_clip ) / sr
-        
-        human_labels_with_in_area = []
-        for item in human_labels:
-            if item["onset"] < area_offset and item["offset"] > area_onset and item["offset"] > item["onset"]:
-                human_labels_with_in_area.append(
-                    {
-                        "onset":max(0, item["onset"] - area_onset),
-                        "offset":min( area_offset - area_onset, item["offset"] - area_onset ),
-                        "cluster": cluster_separator.join( [item["species"], item["individual"], item["clustername"]] ) 
-                    }
-                )
-        human_labels_with_in_area.sort( key = lambda x:x["onset"] )
-        label_clip = {
-            "onset":[ item["onset"] for item in human_labels_with_in_area],
-            "offset":[ item["offset"] for item in human_labels_with_in_area],
-            "cluster":[ item["cluster"] for item in human_labels_with_in_area]
-        }
-        if isinstance( min_frequency, int ):
-            label_clip["min_frequency"] = min_frequency
-        
-        audio_fname = "%s_%d.wav"%( audio_id, count )
-        label_fname = "%s_%d.json"%( audio_id, count )
-        buffer = io.BytesIO()
-        sf.write(buffer, audio_clip, samplerate=sr, format='WAV')
-        buffer.seek(0)
-        training_dataset_files.append( ( audio_fname, buffer.read() ) )
-        buffer.close()
-        
-        buffer = io.BytesIO()
-        buffer.write(json.dumps(label_clip).encode('utf-8'))
-        buffer.seek(0)
-        training_dataset_files.append( ( label_fname, buffer.read() ) )
-        buffer.close()
-        
-    if len(training_dataset_files) == 0:
+    if file_count == 0:
         return jsonify({"error":"No valid training data specified. Re-check the annotated areas."}), 400
     
-    response, status_code = submit_training_request( args.segmentation_service_address, new_model_name, inital_model_name, training_dataset_files, num_epochs = 3 )
+    response, status_code = submit_training_request( args.segmentation_service_address, new_model_name, inital_model_name, memory_file, num_epochs = 3 )
     status_code = 201 if status_code != 400 else 400
     
     return jsonify( response ), status_code
