@@ -5,7 +5,7 @@ import io
 import soundfile as sf
 
 
-def segment_audio( service_address, model_name, audio, sr, min_frequency = None, spec_time_step = None ):
+def segment_audio( service_address, model_name, audio, sr, min_frequency = None, spec_time_step = None, channel_id = 0 ):
     buffer = io.BytesIO()
     sf.write(buffer, audio, samplerate=sr, format='WAV')
     # Rewind the buffer to the beginning so we can read its contents
@@ -13,7 +13,8 @@ def segment_audio( service_address, model_name, audio, sr, min_frequency = None,
     response = requests.post( service_address + "/segment", files = { "audio_file": buffer.read() },
                                 data = { "model_name":model_name,
                                             "min_frequency":min_frequency,
-                                            "spec_time_step":spec_time_step
+                                            "spec_time_step":spec_time_step,
+                                            "channel_id": channel_id
                                           })
     prediction = response.json()
     final_prediction = [ {
