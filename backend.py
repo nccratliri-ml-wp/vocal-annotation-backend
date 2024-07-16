@@ -202,7 +202,7 @@ def parse_clustername( cluster, cluster_separator ):
         parsed_res = {
             "species":"Unknown",
             "individual":"Unknown",
-            "clustername":"Unknown"
+            "clustername": cluster # "Unknown"
         }
     return parsed_res
     
