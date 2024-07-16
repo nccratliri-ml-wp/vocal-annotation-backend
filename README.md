@@ -9,14 +9,16 @@ Activate the environment
 ```bash
 conda activate audio_backend
 ```
-Install dependices via pip
-```bash
-pip install -r requirements.txt
-```
 Install FFMPEG (needed in order to process MP3 audios correctly)
 ```bash
 conda install conda-forge::ffmpeg
 ```
+
+Install dependices via pip
+```bash
+pip install -r requirements.txt
+```
+
 ## Method 2
 Install via environment.yml file
 ```bash
