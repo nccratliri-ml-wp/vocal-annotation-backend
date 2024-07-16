@@ -1,9 +1,9 @@
 jupyterlab
 flask
 flask-cors
-numpy
 librosa
 matplotlib
 scikit-image
 pydub
 pandas
+numpy==1.26.4
