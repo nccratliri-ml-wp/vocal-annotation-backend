@@ -511,7 +511,7 @@ def get_labels():
     """
     Perform authorization HERE:
     """
-    if token not in ["123"]:
+    if token not in ["","123"]:
         return jsonify( {"error":"unauthorized"} ), 400
         
     
@@ -571,7 +571,7 @@ def finetune_whisperseg():
     """
     Perform authorization HERE:
     """
-    if token not in ["123"]:
+    if token not in ["","123"]:
         return jsonify( {"error":"unauthorized"} ), 400
     
     
