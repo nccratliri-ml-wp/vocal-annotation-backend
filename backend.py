@@ -557,7 +557,7 @@ def finetune_whisperseg():
     annotated_areas = request_info["annotated_areas"]
     human_labels = request_info["human_labels"]
     new_model_name = request_info["new_model_name"]
-    inital_model_name = request_info["inital_model_name"]
+    initial_model_name = request_info["initial_model_name"]
     min_frequency = request_info.get( "min_frequency", None )
     
     ## update the timestamp of the audio_id
@@ -618,7 +618,7 @@ def finetune_whisperseg():
     if file_count == 0:
         return jsonify({"error":"No valid training data specified. Re-check the annotated areas."}), 400
     
-    response, status_code = submit_training_request( args.segmentation_service_address, new_model_name, inital_model_name, memory_file, num_epochs = 3 )
+    response, status_code = submit_training_request( args.segmentation_service_address, new_model_name, initial_model_name, memory_file, num_epochs = 3 )
     status_code = 201 if status_code != 400 else 400
     
     return jsonify( response ), status_code

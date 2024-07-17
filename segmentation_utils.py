@@ -25,10 +25,10 @@ def segment_audio( service_address, model_name, audio, sr, min_frequency = None,
     
     return final_prediction
 
-def submit_training_request( service_address, model_name, inital_model_name, memory_file, num_epochs = 3 ):
+def submit_training_request( service_address, model_name, initial_model_name, memory_file, num_epochs = 3 ):
     files = { "zip":memory_file }
     response = requests.post( service_address + "/submit-training-request", files=files, data = { "model_name":model_name,
-                                                        "inital_model_name":inital_model_name,
+                                                        "initial_model_name":initial_model_name,
                                                         "num_epochs":num_epochs
                                                       })
 

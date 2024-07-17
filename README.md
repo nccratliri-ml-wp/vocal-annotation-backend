@@ -640,7 +640,7 @@ for item in human_labels: ## to make it JSON serializable
     item["channelIndex"] = int(item["channelIndex"])
 
 new_model_name = "whisperseg-base-debug-v1.0"
-inital_model_name = "whisperseg-base"
+initial_model_name = "whisperseg-base"
 min_frequency = 0
 ```
 
@@ -653,7 +653,7 @@ response = requests.post(
         "annotated_areas":annotated_areas,
         "human_labels":human_labels,
         "new_model_name":new_model_name,
-        "inital_model_name":inital_model_name,
+        "initial_model_name":initial_model_name,
         "min_frequency":min_frequency
     }),
     headers = {"content-type":"application/json"}
