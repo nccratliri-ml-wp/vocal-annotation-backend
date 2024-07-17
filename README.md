@@ -291,16 +291,34 @@ response
        'status': 'ready'},
       {'eta': '--:--:--', 'model_name': 'whisperseg-large', 'status': 'ready'},
       {'eta': '--:--:--',
-       'model_name': 'r3428-99dph-whisperseg_base',
-       'status': 'ready'},
-      {'eta': '--:--:--',
        'model_name': 'r3428-99dph-whisperseg-base-v2.0',
        'status': 'ready'},
       {'eta': '--:--:--',
        'model_name': 'r3428-99dph-whisperseg-large',
        'status': 'ready'},
       {'eta': '--:--:--',
-       'model_name': 'new-whisperseg-bengalese-finch',
+       'model_name': 'whisperseg-large-meerkat-pup-vs-adult',
+       'status': 'ready'},
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-large-meerkat-vs-non-meerkat',
+       'status': 'ready'},
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-base-finetune-trial1',
+       'status': 'ready'},
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-yuhang-zebra-finch-single-type-call',
+       'status': 'ready'},
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-large-finetune-trial2',
+       'status': 'ready'},
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-base-finetune-trial2_grouped_ignoring_pitchshift',
+       'status': 'ready'},
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-base-finetune-trial3_grouped_ignoring_pitchatall',
+       'status': 'ready'},
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-large-finetune-trial3_grouped_ignoring_pitchatall',
        'status': 'ready'}]}
 
 
@@ -324,16 +342,34 @@ response
        'status': 'ready'},
       {'eta': '--:--:--', 'model_name': 'whisperseg-large', 'status': 'ready'},
       {'eta': '--:--:--',
-       'model_name': 'r3428-99dph-whisperseg_base',
-       'status': 'ready'},
-      {'eta': '--:--:--',
        'model_name': 'r3428-99dph-whisperseg-base-v2.0',
        'status': 'ready'},
       {'eta': '--:--:--',
        'model_name': 'r3428-99dph-whisperseg-large',
        'status': 'ready'},
       {'eta': '--:--:--',
-       'model_name': 'new-whisperseg-bengalese-finch',
+       'model_name': 'whisperseg-large-meerkat-pup-vs-adult',
+       'status': 'ready'},
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-large-meerkat-vs-non-meerkat',
+       'status': 'ready'},
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-base-finetune-trial1',
+       'status': 'ready'},
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-yuhang-zebra-finch-single-type-call',
+       'status': 'ready'},
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-large-finetune-trial2',
+       'status': 'ready'},
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-base-finetune-trial2_grouped_ignoring_pitchshift',
+       'status': 'ready'},
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-base-finetune-trial3_grouped_ignoring_pitchatall',
+       'status': 'ready'},
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-large-finetune-trial3_grouped_ignoring_pitchatall',
        'status': 'ready'}]}
 
 
@@ -358,6 +394,8 @@ response
 
 ## Get WhisperSeg Segmentation
 
+When calling the get-labels API, the parameter "token" must be provided. Otherwise the returned response will be **{"error":"unauthorized"}**, with a status_code 400
+
 
 ```python
 response = requests.post( 
@@ -365,7 +403,8 @@ response = requests.post(
     data = json.dumps( {
         "audio_id":audio_id,
         "model_name":"whisperseg-large",
-        "min_frequency": 0
+        "min_frequency": 0,
+        "token":"123"
     }),
     headers = {"content-type":"application/json"}
 ).json()
@@ -373,37 +412,45 @@ response = requests.post(
 
 
 ```python
-response["labels"][:5]
+response["labels"][:2]
 ```
 
 
 
 
-    [{'clustername': 'Unknown',
+    [{'clustername': 'vocal',
       'individual': 'Unknown',
       'offset': 14.595,
       'onset': 14.497,
       'species': 'Unknown'},
-     {'clustername': 'Unknown',
+     {'clustername': 'vocal',
       'individual': 'Unknown',
       'offset': 15.108,
       'onset': 15.008,
-      'species': 'Unknown'},
-     {'clustername': 'Unknown',
-      'individual': 'Unknown',
-      'offset': 15.695,
-      'onset': 15.572,
-      'species': 'Unknown'},
-     {'clustername': 'Unknown',
-      'individual': 'Unknown',
-      'offset': 16.772,
-      'onset': 16.715,
-      'species': 'Unknown'},
-     {'clustername': 'Unknown',
-      'individual': 'Unknown',
-      'offset': 17.028,
-      'onset': 16.983,
       'species': 'Unknown'}]
+
+
+
+Here is what the response look when no valid token provided:
+
+
+```python
+response = requests.post( 
+    "http://localhost:8050/get-labels",
+    data = json.dumps( {
+        "audio_id":audio_id,
+        "model_name":"whisperseg-large",
+        "min_frequency": 0,
+    }),
+    headers = {"content-type":"application/json"}
+)
+response
+```
+
+
+
+
+    <Response [400]>
 
 
 
@@ -442,7 +489,7 @@ audio_id
 
 
 
-    '41525b82-f471-4699-85b0-1cfe44ed828b'
+    '74fbb1fa-4a1d-47f6-8ef3-4a24f8a45eaa'
 
 
 
@@ -561,18 +608,35 @@ response
        'status': 'ready'},
       {'eta': '--:--:--', 'model_name': 'whisperseg-large', 'status': 'ready'},
       {'eta': '--:--:--',
-       'model_name': 'r3428-99dph-whisperseg_base',
-       'status': 'ready'},
-      {'eta': '--:--:--',
        'model_name': 'r3428-99dph-whisperseg-base-v2.0',
        'status': 'ready'},
       {'eta': '--:--:--',
        'model_name': 'r3428-99dph-whisperseg-large',
        'status': 'ready'},
       {'eta': '--:--:--',
-       'model_name': 'new-whisperseg-bengalese-finch',
+       'model_name': 'whisperseg-large-meerkat-pup-vs-adult',
        'status': 'ready'},
-      {'eta': '--:--:--', 'model_name': 'whisperseg-new-v1.0', 'status': 'ready'}]}
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-large-meerkat-vs-non-meerkat',
+       'status': 'ready'},
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-base-finetune-trial1',
+       'status': 'ready'},
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-yuhang-zebra-finch-single-type-call',
+       'status': 'ready'},
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-large-finetune-trial2',
+       'status': 'ready'},
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-base-finetune-trial2_grouped_ignoring_pitchshift',
+       'status': 'ready'},
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-base-finetune-trial3_grouped_ignoring_pitchatall',
+       'status': 'ready'},
+      {'eta': '--:--:--',
+       'model_name': 'whisperseg-large-finetune-trial3_grouped_ignoring_pitchatall',
+       'status': 'ready'}]}
 
 
 
@@ -597,33 +661,67 @@ all_models
     [{'eta': '--:--:--', 'model_name': 'whisperseg-base', 'status': 'ready'},
      {'eta': '--:--:--', 'model_name': 'whisperseg-large', 'status': 'ready'},
      {'eta': '--:--:--',
-      'model_name': 'r3428-99dph-whisperseg_base',
-      'status': 'ready'},
-     {'eta': '--:--:--',
       'model_name': 'r3428-99dph-whisperseg-base-v2.0',
       'status': 'ready'},
      {'eta': '--:--:--',
       'model_name': 'r3428-99dph-whisperseg-large',
       'status': 'ready'},
      {'eta': '--:--:--',
-      'model_name': 'new-whisperseg-bengalese-finch',
+      'model_name': 'whisperseg-large-meerkat-pup-vs-adult',
       'status': 'ready'},
-     {'eta': '--:--:--', 'model_name': 'whisperseg-new-v1.0', 'status': 'ready'},
+     {'eta': '--:--:--',
+      'model_name': 'whisperseg-large-meerkat-vs-non-meerkat',
+      'status': 'ready'},
+     {'eta': '--:--:--',
+      'model_name': 'whisperseg-base-finetune-trial1',
+      'status': 'ready'},
+     {'eta': '--:--:--',
+      'model_name': 'whisperseg-yuhang-zebra-finch-single-type-call',
+      'status': 'ready'},
+     {'eta': '--:--:--',
+      'model_name': 'whisperseg-large-finetune-trial2',
+      'status': 'ready'},
+     {'eta': '--:--:--',
+      'model_name': 'whisperseg-base-finetune-trial2_grouped_ignoring_pitchshift',
+      'status': 'ready'},
+     {'eta': '--:--:--',
+      'model_name': 'whisperseg-base-finetune-trial3_grouped_ignoring_pitchatall',
+      'status': 'ready'},
+     {'eta': '--:--:--',
+      'model_name': 'whisperseg-large-finetune-trial3_grouped_ignoring_pitchatall',
+      'status': 'ready'},
      {'eta': '--:--:--', 'model_name': 'whisperseg-base', 'status': 'ready'},
      {'eta': '--:--:--', 'model_name': 'whisperseg-large', 'status': 'ready'},
      {'eta': '--:--:--',
-      'model_name': 'r3428-99dph-whisperseg_base',
-      'status': 'ready'},
-     {'eta': '--:--:--',
       'model_name': 'r3428-99dph-whisperseg-base-v2.0',
       'status': 'ready'},
      {'eta': '--:--:--',
       'model_name': 'r3428-99dph-whisperseg-large',
       'status': 'ready'},
      {'eta': '--:--:--',
-      'model_name': 'new-whisperseg-bengalese-finch',
+      'model_name': 'whisperseg-large-meerkat-pup-vs-adult',
       'status': 'ready'},
-     {'eta': '--:--:--', 'model_name': 'whisperseg-new-v1.0', 'status': 'ready'}]
+     {'eta': '--:--:--',
+      'model_name': 'whisperseg-large-meerkat-vs-non-meerkat',
+      'status': 'ready'},
+     {'eta': '--:--:--',
+      'model_name': 'whisperseg-base-finetune-trial1',
+      'status': 'ready'},
+     {'eta': '--:--:--',
+      'model_name': 'whisperseg-yuhang-zebra-finch-single-type-call',
+      'status': 'ready'},
+     {'eta': '--:--:--',
+      'model_name': 'whisperseg-large-finetune-trial2',
+      'status': 'ready'},
+     {'eta': '--:--:--',
+      'model_name': 'whisperseg-base-finetune-trial2_grouped_ignoring_pitchshift',
+      'status': 'ready'},
+     {'eta': '--:--:--',
+      'model_name': 'whisperseg-base-finetune-trial3_grouped_ignoring_pitchatall',
+      'status': 'ready'},
+     {'eta': '--:--:--',
+      'model_name': 'whisperseg-large-finetune-trial3_grouped_ignoring_pitchatall',
+      'status': 'ready'}]
 
 
 
@@ -632,17 +730,19 @@ all_models
 
 ```python
 # audio_id
-annotated_areas = [ { "onset":0, "offset":45 } ]  ## the first 15 seconds are annotated
+annotated_areas = [ { "onset":0, "offset":40 } ]  ## the first 15 seconds are annotated
 human_labels = [dict(df.iloc[idx]) for idx in range(len(df)) ]  ## get the human_labels
 for item in human_labels: ## to make it JSON serializable
     item["onset"] = float(item["onset"])
     item["offset"] = float(item["offset"])  
     item["channelIndex"] = int(item["channelIndex"])
 
-new_model_name = "whisperseg-base-debug-v1.0"
+new_model_name = "whisperseg-base-debug-v1.1"
 initial_model_name = "whisperseg-base"
 min_frequency = 0
 ```
+
+**Note**: When calling the finetune-whisperseg API, a valid "token" must be provided. Otherwise the returned response will be **{"error":"unauthorized"}**, with a status_code 400
 
 
 ```python
@@ -654,7 +754,8 @@ response = requests.post(
         "human_labels":human_labels,
         "new_model_name":new_model_name,
         "initial_model_name":initial_model_name,
-        "min_frequency":min_frequency
+        "min_frequency":min_frequency,
+        "token":"123"
     }),
     headers = {"content-type":"application/json"}
 ).json()
@@ -693,11 +794,17 @@ response = requests.post(
         "audio_id":audio_id,
         "annotated_areas":annotated_areas,
         "human_labels":human_labels,
-        "model_name":"whisperseg-base-debug-v1.0",
-        "min_frequency": 0
+        "model_name":"whisperseg-base-debug-v1.1",
+        "min_frequency": 0,
+        "token":"123"  ## Do not forget the token for segmentation
     }),
     headers = {"content-type":"application/json"}
 ).json()
+```
+
+
+```python
+# response["labels"]
 ```
 
 
@@ -805,9 +912,9 @@ out_df
       <td>...</td>
     </tr>
     <tr>
-      <th>411</th>
-      <td>204.100000</td>
-      <td>204.310000</td>
+      <th>413</th>
+      <td>204.103000</td>
+      <td>204.300000</td>
       <td>zebra finch</td>
       <td>bird1</td>
       <td>C</td>
@@ -815,29 +922,9 @@ out_df
       <td>0</td>
     </tr>
     <tr>
-      <th>412</th>
-      <td>204.310000</td>
-      <td>204.513000</td>
-      <td>zebra finch</td>
-      <td>bird1</td>
-      <td>A</td>
-      <td>audio.wav</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>413</th>
-      <td>204.520000</td>
-      <td>204.773000</td>
-      <td>zebra finch</td>
-      <td>bird1</td>
-      <td>B</td>
-      <td>audio.wav</td>
-      <td>0</td>
-    </tr>
-    <tr>
       <th>414</th>
-      <td>204.847000</td>
-      <td>205.027000</td>
+      <td>204.307000</td>
+      <td>204.517000</td>
       <td>zebra finch</td>
       <td>bird1</td>
       <td>A</td>
@@ -846,6 +933,26 @@ out_df
     </tr>
     <tr>
       <th>415</th>
+      <td>204.520000</td>
+      <td>204.767000</td>
+      <td>zebra finch</td>
+      <td>bird1</td>
+      <td>B</td>
+      <td>audio.wav</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>416</th>
+      <td>204.850000</td>
+      <td>205.027000</td>
+      <td>zebra finch</td>
+      <td>bird1</td>
+      <td>A</td>
+      <td>audio.wav</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>417</th>
       <td>205.030000</td>
       <td>205.300000</td>
       <td>zebra finch</td>
@@ -856,7 +963,7 @@ out_df
     </tr>
   </tbody>
 </table>
-<p>416 rows × 7 columns</p>
+<p>418 rows × 7 columns</p>
 </div>
 
 

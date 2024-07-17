@@ -506,6 +506,14 @@ def get_labels():
     human_labels = request_info.get("human_labels", [])
     model_name = request_info.get("model_name", "whisperseg-base")
     min_frequency = request_info.get( "min_frequency", None )
+    token = request_info.get("token", "")
+
+    """
+    Perform authorization HERE:
+    """
+    if token not in ["123"]:
+        return jsonify( {"error":"unauthorized"} ), 400
+        
     
     ## update the timestamp of the audio_id
     audio_dict[audio_id]["timestamp"] = datetime.now()
@@ -548,7 +556,6 @@ def get_labels():
         
     return jsonify({"labels":final_prediction}), 201
 
-
 @app.route("/finetune-whisperseg", methods=['POST'])
 def finetune_whisperseg():
     global audio_dict, cluster_separator, args
@@ -559,6 +566,14 @@ def finetune_whisperseg():
     new_model_name = request_info["new_model_name"]
     initial_model_name = request_info["initial_model_name"]
     min_frequency = request_info.get( "min_frequency", None )
+    token = request_info.get("token", "")
+
+    """
+    Perform authorization HERE:
+    """
+    if token not in ["123"]:
+        return jsonify( {"error":"unauthorized"} ), 400
+    
     
     ## update the timestamp of the audio_id
     audio_dict[audio_id]["timestamp"] = datetime.now()
