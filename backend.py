@@ -435,6 +435,7 @@ def get_audio_clip_wav():
     
     request_info = request.json
     audio_id = request_info["audio_id"]
+
     start_time = request_info["start_time"]
     clip_duration = request_info["clip_duration"]
     
@@ -512,7 +513,7 @@ def get_labels():
     Perform authorization HERE:
     """
     if token not in ["","123"]:
-        return jsonify( {"error":"unauthorized"} ), 400
+        return jsonify( {"error":"unauthorized"} ), 403
         
     
     ## update the timestamp of the audio_id
@@ -572,7 +573,7 @@ def finetune_whisperseg():
     Perform authorization HERE:
     """
     if token not in ["","123"]:
-        return jsonify( {"error":"unauthorized"} ), 400
+        return jsonify( {"error":"unauthorized"} ), 403
     
     
     ## update the timestamp of the audio_id
