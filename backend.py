@@ -21,7 +21,7 @@ from pydub import AudioSegment
 from datetime import datetime, timedelta
 import time
 import threading
-from spec_utils import SpecCalConstantQ, SpecCalLogMel
+from spec_utils import SpecCalConstantQ, SpecCalLogMel, SpecCalDummy
 from segmentation_utils import *
 import re
 import zipfile
@@ -87,6 +87,10 @@ def get_spectrogram( audio, sr, start_time, hop_length,
         spec_cal = SpecCalConstantQ( sr = sr, hop_length = hop_length, 
                                   min_frequency = min_frequency, max_frequency = max_frequency,
                                   n_bins = n_bins, bins_per_octave = bins_per_octave )
+    elif spec_cal_method == "dummy":
+        spec_cal = SpecCalDummy( sr = sr, hop_length = hop_length, 
+                                  min_frequency = min_frequency, max_frequency = max_frequency,
+                                  n_bins = n_bins, n_fft = n_fft )
     else:
         assert False, "Unsupported spectrogram computation method!"
     

@@ -147,3 +147,64 @@ class SpecCalLogMel:
         log_mel_spec = np.flip(self.cmap( log_mel_spec )[:,:,:3], axis = 0)
     
         return log_mel_spec
+    
+    
+class SpecCalDummy:
+    def __init__(self, sr, hop_length, min_frequency = None, max_frequency = None, n_bins = 256,
+                 n_fft = None,
+                 color_map = "inferno", **kwargs ):
+        self.sr = sr
+        self.hop_length = hop_length
+        self.min_frequency = 0 if min_frequency is None or min_frequency < 0 else min_frequency
+        self.max_frequency = int(sr/2) if max_frequency is None or max_frequency <= 0 else max_frequency
+        if self.max_frequency > int(sr/2):
+            self.max_frequency = int(sr/2)
+        self.n_bins = n_bins        
+        self.cmap = matplotlib.colormaps.get_cmap(color_map)
+        
+        if n_fft is None or n_fft <= 0:
+            if sr <= 32000:
+                n_fft = 512
+            elif sr <= 80000:
+                n_fft = 1024
+            elif sr <= 150000:
+                n_fft = 2048
+            elif sr <= 300000:
+                n_fft = 4096
+            else:
+                n_fft = 8192
+        else:
+            n_fft = max(5, n_fft)
+        self.n_fft = n_fft
+        self.freq_upsampling_ratio = 8
+
+        self.freqs = mel_frequencies( self.n_bins, fmin = self.min_frequency, fmax = self.max_frequency )
+
+    def sigmoid(self, x, offset, low, high, sharpness):
+        remapped = (x - offset) * sharpness
+        y = remapped / (1 + np.abs(remapped))
+    
+        # guarantee the output starts at 0 and ends at 1
+        x_high = (high - offset) * sharpness
+        x_low = (low - offset) * sharpness
+        y_high = x_high / (1 + np.abs(x_high))
+        y_low = x_low / (1 + np.abs(x_low))
+        y = (y - y_low) / (y_high - y_low)
+
+        return y
+    
+    def min_max_norm(self, im):
+        ## This is used to increase the contrast of the image
+        pseudo_min = np.percentile(im, 0.01)
+        pseudo_max = np.percentile(im, 99.99)
+    
+        # return (im - im.min()) / max(im.max() - im.min(), 1e-12)
+        return (im-pseudo_min) / max( pseudo_max - pseudo_min, 1e-12 )
+    
+    
+    def __call__(self, audio ):
+        log_mel_spec = (audio != 0)[::self.hop_length][np.newaxis, :]
+        log_mel_spec = np.repeat( log_mel_spec, self.n_bins, axis = 0 ).astype(np.float32)
+        log_mel_spec = np.flip(self.cmap( log_mel_spec )[:,:,:3], axis = 0)
+
+        return log_mel_spec
