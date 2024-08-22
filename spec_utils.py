@@ -203,7 +203,14 @@ class SpecCalDummy:
     
     
     def __call__(self, audio ):
-        log_mel_spec = (audio != 0)[::self.hop_length][np.newaxis, :]
+        try:
+            log_mel_spec = audio != 0
+            log_mel_spec_new = np.logical_or(log_mel_spec, np.concatenate( [ np.zeros( self.n_fft // 2 ), log_mel_spec[:-self.n_fft // 2] ], axis = 0 ) )
+            log_mel_spec = np.logical_or(log_mel_spec_new, np.concatenate( [ log_mel_spec[self.n_fft // 2:], np.zeros( self.n_fft // 2 )  ], axis = 0 ) )
+        except:
+            log_mel_spec = audio != 0
+            
+        log_mel_spec =  log_mel_spec[::self.hop_length][np.newaxis, :]
         log_mel_spec = np.repeat( log_mel_spec, self.n_bins, axis = 0 ).astype(np.float32)
         log_mel_spec = np.flip(self.cmap( log_mel_spec )[:,:,:3], axis = 0)
 
