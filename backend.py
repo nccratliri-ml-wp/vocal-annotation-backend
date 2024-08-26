@@ -227,6 +227,8 @@ def upload():
     if num_spec_columns is None:
         num_spec_columns = 1000
 
+    print("File received!", datetime.now())
+
     ## for certain reason after Flask transfer b"\r\n" can be prefixed to the data, so we need to remove them, otherwise the librosa load will trigger error
     orig_audio_multi_channels, orig_sr = librosa.load( io.BytesIO(newAudioFile.read().lstrip()), sr = None, mono = False ) 
     if sr is not None:
