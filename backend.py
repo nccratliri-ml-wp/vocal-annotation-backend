@@ -75,6 +75,7 @@ def get_spectrogram( audio, sr, start_time, hop_length,
                    ):
     if spec_cal_method is None:
         spec_cal_method = "log-mel"
+                
     
     hop_length = int(hop_length)
     num_samples = hop_length * num_spec_columns
