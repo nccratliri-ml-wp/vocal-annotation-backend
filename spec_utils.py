@@ -202,15 +202,14 @@ class SpecCalDummy:
         return (im-pseudo_min) / max( pseudo_max - pseudo_min, 1e-12 )
     
 
-    def get_log_mel_spec_uncolored(self, audio, hop_length ):
-        nfft = 16000
-        stft_result = librosa.stft( y=audio, hop_length=hop_length, n_fft=nfft )[:,:-1]    
+    def get_log_mel_spec_uncolored(self, audio, hop_length, n_fft ):
+        stft_result = librosa.stft( y=audio, hop_length=hop_length, n_fft=n_fft )[:,:-1]    
         spec = np.abs(stft_result)**2
     
         new_spec = np.zeros( ( spec.shape[0]*self.freq_upsampling_ratio, spec.shape[1] ) )
         for offset in range( self.freq_upsampling_ratio ):
             new_spec[ offset::self.freq_upsampling_ratio,: ] = spec
-        pseudo_n_fft = nfft * self.freq_upsampling_ratio
+        pseudo_n_fft = n_fft * self.freq_upsampling_ratio
         new_spec = new_spec[ : pseudo_n_fft//2+1 ]
         melfb = librosa.filters.mel(sr=self.sr, n_mels=self.n_bins, n_fft = pseudo_n_fft, fmin=self.min_frequency, fmax = self.max_frequency )
         mel_spec = np.matmul(melfb, new_spec)
@@ -233,11 +232,13 @@ class SpecCalDummy:
         
         return log_mel_spec        
     
-    def __call__(self, audio, hop_length = None ):
+    def __call__(self, audio, hop_length = None, n_fft = None ):
         if hop_length is None:
             hop_length = self.hop_length
-        
-        log_mel_spec = self.get_log_mel_spec_uncolored( audio, hop_length )
+        if n_fft is None:
+            n_fft = min( len(audio), 16000 )
+            
+        log_mel_spec = self.get_log_mel_spec_uncolored( audio, hop_length, n_fft )
         dummy_spec = self.get_dummy_spec_uncolored( audio, hop_length )
         
         mix_shape = np.minimum( dummy_spec.shape, log_mel_spec.shape )
@@ -251,7 +252,7 @@ class SpecCalDummy:
         offsets = np.argwhere( diff < 0 )[:,0] - 1
         for onset, offset in zip( onsets, offsets ):
             log_mel_spec_block = log_mel_spec[ :, onset:offset ]
-            mask_indices = log_mel_spec_block.mean(axis = 1) < 0.8
+            mask_indices = log_mel_spec_block.mean(axis = 1) < 0.6
             mask_indices = np.logical_or( mask_indices, np.array(mask_indices[1:].tolist() + [0]))
             inverse_mask_indices = mask_indices == 0
             dummy_spec[mask_indices, onset:offset] = 0
