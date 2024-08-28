@@ -663,7 +663,36 @@ def post_annotations():
 @app.route("/metadata/<hash_id>", methods=['GET'])
 def get_metadata(hash_id):
     global args
-    res = requests.get( args.dataplatform_evolving_language_get_metadata_service_address + "/" + hash_id ).json()
+    
+    try:
+        res = requests.get( args.dataplatform_evolving_language_get_metadata_service_address + "/" + hash_id ).json()
+    except:
+        pass
+    
+    ## debugging purpose
+    if hash_id == "test_bandpass_white_noise_1":
+        res = {
+          "response": [
+            {
+              "annotation_instance": "bandpass_white_noise",
+              "f_high": 16000,
+              "f_low": 0,
+              "filename": "white-noise.wav",
+              "hop_length": 160,
+              "id": "test_bandpass_white_noise_1",
+              "labels": {
+                "channels": {}
+              },
+              "nfft": 1024,
+              "num_spec_columns": 1000,
+              "sampling_rate": 32000,
+              "spec_cal_method": "dummy",
+              "time": "2024-08-20 20:01:43",
+              "url": "https://huggingface.co/datasets/nccratliri/example-bandpass-white-noise/resolve/main/white-noise.wav"
+            }
+          ]
+        }
+    
     return jsonify(res), 201
 
 

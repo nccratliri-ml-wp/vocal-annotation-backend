@@ -202,14 +202,15 @@ class SpecCalDummy:
         return (im-pseudo_min) / max( pseudo_max - pseudo_min, 1e-12 )
     
 
-    def get_log_mel_spec_uncolored(self, audio ):
-        stft_result = librosa.stft( y=audio, hop_length=self.hop_length, n_fft=self.n_fft )[:,:-1]    
+    def get_log_mel_spec_uncolored(self, audio, hop_length ):
+        nfft = 16000
+        stft_result = librosa.stft( y=audio, hop_length=hop_length, n_fft=nfft )[:,:-1]    
         spec = np.abs(stft_result)**2
     
         new_spec = np.zeros( ( spec.shape[0]*self.freq_upsampling_ratio, spec.shape[1] ) )
         for offset in range( self.freq_upsampling_ratio ):
             new_spec[ offset::self.freq_upsampling_ratio,: ] = spec
-        pseudo_n_fft = self.n_fft * self.freq_upsampling_ratio
+        pseudo_n_fft = nfft * self.freq_upsampling_ratio
         new_spec = new_spec[ : pseudo_n_fft//2+1 ]
         melfb = librosa.filters.mel(sr=self.sr, n_mels=self.n_bins, n_fft = pseudo_n_fft, fmin=self.min_frequency, fmax = self.max_frequency )
         mel_spec = np.matmul(melfb, new_spec)
@@ -219,7 +220,7 @@ class SpecCalDummy:
         
         return log_mel_spec
 
-    def get_dummy_spec_uncolored( self, audio ):
+    def get_dummy_spec_uncolored( self, audio, hop_length ):
         try:
             log_mel_spec = audio != 0
             log_mel_spec_new = np.logical_or(log_mel_spec, np.concatenate( [ np.zeros( self.n_fft // 2 ), log_mel_spec[:-self.n_fft // 2] ], axis = 0 ) )
@@ -227,14 +228,17 @@ class SpecCalDummy:
         except:
             log_mel_spec = audio != 0
             
-        log_mel_spec =  log_mel_spec[::self.hop_length][np.newaxis, :]
+        log_mel_spec = log_mel_spec[::hop_length][np.newaxis, :]
         log_mel_spec = np.repeat( log_mel_spec, self.n_bins, axis = 0 ).astype(np.float32)
         
-        return log_mel_spec
+        return log_mel_spec        
     
-    def __call__(self, audio ):
-        log_mel_spec = self.get_log_mel_spec_uncolored( audio )
-        dummy_spec = self.get_dummy_spec_uncolored( audio )
+    def __call__(self, audio, hop_length = None ):
+        if hop_length is None:
+            hop_length = self.hop_length
+        
+        log_mel_spec = self.get_log_mel_spec_uncolored( audio, hop_length )
+        dummy_spec = self.get_dummy_spec_uncolored( audio, hop_length )
         
         mix_shape = np.minimum( dummy_spec.shape, log_mel_spec.shape )
         log_mel_spec = log_mel_spec[:mix_shape[0], :mix_shape[1] ]
@@ -247,8 +251,11 @@ class SpecCalDummy:
         offsets = np.argwhere( diff < 0 )[:,0] - 1
         for onset, offset in zip( onsets, offsets ):
             log_mel_spec_block = log_mel_spec[ :, onset:offset ]
-            dummy_spec[log_mel_spec_block.mean(axis = 1) < 0.8, onset:offset] = 0
-        
+            mask_indices = log_mel_spec_block.mean(axis = 1) < 0.8
+            mask_indices = np.logical_or( mask_indices, np.array(mask_indices[1:].tolist() + [0]))
+            inverse_mask_indices = mask_indices == 0
+            dummy_spec[mask_indices, onset:offset] = 0
+            # print( self.freqs[inverse_mask_indices][:5], self.freqs[inverse_mask_indices][-5:] )
         color_spec = np.flip(self.cmap( dummy_spec )[:,:,:3], axis = 0)
         return color_spec
     
