@@ -716,9 +716,9 @@ def release_audio_given_ids():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-flask_port", help="The port of the flask app.", default=8050, type=int)
-    parser.add_argument("-segmentation_service_address", help="The address to the WhisperSeg segmentation API.", default="https://viable-sunbird-literate.ngrok-free.app/")
-    parser.add_argument("-dataplatform_evolving_language_post_annotation_service_address", help="The address to the dataplatform evolving language (Used for post annotations).", default="https://dataplatform.evolvinglanguage.ch/animal_call/annotations/")
-    parser.add_argument("-dataplatform_evolving_language_get_metadata_service_address", help="The address to the dataplatform evolving language (Used for get metadata).", default="http://vocallbase.evolvinglanguage.ch/metadata/")
+    parser.add_argument("-segmentation_service_address", help="The address to the WhisperSeg segmentation API.")
+    parser.add_argument("-dataplatform_evolving_language_post_annotation_service_address", help="The address to the dataplatform evolving language (Used for post annotations).")
+    parser.add_argument("-dataplatform_evolving_language_get_metadata_service_address", help="The address to the dataplatform evolving language (Used for get metadata).")
     args = parser.parse_args()
     
     audio_dict = {}
