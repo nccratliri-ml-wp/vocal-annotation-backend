@@ -656,8 +656,18 @@ def post_annotations():
         headers = { "Content-Type":"application/json",
                     "accept":"application/json"
                   }
-    ).json()
-    return jsonify(res), 201
+    )
+    status_code = res.status_code
+    if status_code == 200 or status_code == 201:
+        status_code = 201
+    else:
+        status_code = 400
+    try:
+        response = res.json()
+    except:
+        response = {"Warning:":"No response in posting annotation"}
+        
+    return jsonify(response), status_code
 
 
 @app.route("/metadata/<hash_id>", methods=['GET'])
