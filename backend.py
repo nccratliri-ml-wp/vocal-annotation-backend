@@ -25,6 +25,7 @@ from spec_utils import SpecCalConstantQ, SpecCalLogMel, SpecCalDummy
 from segmentation_utils import *
 import re
 import zipfile
+from urllib.parse import quote
 
 # Make Flask application
 app = Flask(__name__)
@@ -651,7 +652,7 @@ def finetune_whisperseg():
 def post_annotations():
     global args
     res = requests.post(
-        args.dataplatform_evolving_language_post_annotation_service_address,
+        args.vocallbase_service_address + "/annotations/",
         data = json.dumps(request.json),
         headers = { "Content-Type":"application/json",
                     "accept":"application/json"
@@ -675,7 +676,7 @@ def get_metadata(hash_id):
     global args
     
     try:
-        res = requests.get( args.dataplatform_evolving_language_get_metadata_service_address + "/" + hash_id ).json()
+        res = requests.get( args.vocallbase_service_address + "/metadata/" + hash_id ).json()
     except:
         pass
     
@@ -705,6 +706,17 @@ def get_metadata(hash_id):
     
     return jsonify(res), 201
 
+@app.route("/annotations/<path:file_name>", methods=['GET'])
+def get_annotations(file_name):
+    global args
+    try:
+        encoded_file_name = quote(file_name)
+        res = requests.get(f"{args.vocallbase_service_address}/annotations/{encoded_file_name}").json()
+    except:
+        res = []
+    
+    return jsonify(res), 201
+
 
 @app.route("/release-audio-given-ids", methods=['POST'])
 def release_audio_given_ids():
@@ -727,8 +739,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-flask_port", help="The port of the flask app.", default=8050, type=int)
     parser.add_argument("-segmentation_service_address", help="The address to the WhisperSeg segmentation API.")
-    parser.add_argument("-dataplatform_evolving_language_post_annotation_service_address", help="The address to the dataplatform evolving language (Used for post annotations).")
-    parser.add_argument("-dataplatform_evolving_language_get_metadata_service_address", help="The address to the dataplatform evolving language (Used for get metadata).")
+    parser.add_argument("-vocallbase_service_address", help="The address to the dataplatform evolving language.")
     args = parser.parse_args()
     
     audio_dict = {}
