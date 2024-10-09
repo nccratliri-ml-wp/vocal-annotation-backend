@@ -647,12 +647,34 @@ def finetune_whisperseg():
     
     return jsonify( response ), status_code
     
+
+@app.route("/get-metadata/<hash_id>", methods=['GET'])
+def get_metadata(hash_id):
+    global args
     
-@app.route("/post-annotations", methods=['POST'])
-def post_annotations():
+    try:
+        res = requests.get( args.vocallbase_service_address + "/get-audio-dataset-config-from-hash-id/" + hash_id ).json()
+        res = [ res ]
+    except:
+        pass
+    
+    return jsonify(res), 201
+
+@app.route("/get-annotations/<hash_id>", methods=['GET'])
+def get_annotations(hash_id):
+    global args
+    try:
+        res = requests.get(f"{args.vocallbase_service_address}/annotations/{hash_id}").json()
+    except:
+        res = []
+    
+    return jsonify(res), 201
+
+@app.route("/post-annotations/<hash_id>", methods=['POST'])
+def post_annotations(hash_id):
     global args
     res = requests.post(
-        args.vocallbase_service_address + "/annotations/",
+        args.vocallbase_service_address + f"/annotations/{hash_id}/",
         data = json.dumps(request.json),
         headers = { "Content-Type":"application/json",
                     "accept":"application/json"
@@ -669,53 +691,6 @@ def post_annotations():
         response = {"Warning:":"No response in posting annotation"}
         
     return jsonify(response), status_code
-
-
-@app.route("/metadata/<hash_id>", methods=['GET'])
-def get_metadata(hash_id):
-    global args
-    
-    try:
-        res = requests.get( args.vocallbase_service_address + "/metadata/" + hash_id ).json()
-    except:
-        pass
-    
-    ## debugging purpose
-    if hash_id == "test_bandpass_white_noise_1":
-        res = {
-          "response": [
-            {
-              "annotation_instance": "bandpass_white_noise",
-              "f_high": 16000,
-              "f_low": 0,
-              "filename": "white-noise.wav",
-              "hop_length": 160,
-              "id": "test_bandpass_white_noise_1",
-              "labels": {
-                "channels": {}
-              },
-              "nfft": 1024,
-              "num_spec_columns": 1000,
-              "sampling_rate": 32000,
-              "spec_cal_method": "dummy",
-              "time": "2024-08-20 20:01:43",
-              "url": "https://huggingface.co/datasets/nccratliri/example-bandpass-white-noise/resolve/main/white-noise.wav"
-            }
-          ]
-        }
-    
-    return jsonify(res), 201
-
-@app.route("/annotations/<path:file_name>", methods=['GET'])
-def get_annotations(file_name):
-    global args
-    try:
-        encoded_file_name = quote(file_name)
-        res = requests.get(f"{args.vocallbase_service_address}/annotations/{encoded_file_name}").json()
-    except:
-        res = []
-    
-    return jsonify(res), 201
 
 
 @app.route("/release-audio-given-ids", methods=['POST'])
