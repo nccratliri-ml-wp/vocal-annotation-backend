@@ -719,7 +719,7 @@ if __name__ == '__main__':
     
     audio_dict = {}
     num_spec_columns = 1000
-    n_bins = 200
+    n_bins = 300
     idle_hours = 48
     cluster_separator = "<==SEPARATOR==>"
     
