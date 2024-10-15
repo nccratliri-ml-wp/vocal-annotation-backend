@@ -646,19 +646,24 @@ def finetune_whisperseg():
     status_code = 201 if status_code != 400 else 400
     
     return jsonify( response ), status_code
-    
 
-@app.route("/get-metadata/<hash_id>", methods=['GET'])
-def get_metadata(hash_id):
+@app.route("/get-metadata/", methods=['POST'])
+def get_metadata():
     global args
-    
     try:
-        res = requests.get( args.vocallbase_service_address + "/get-audio-dataset-config-from-hash-id/" + hash_id ).json()
+        request_info = request.json 
+        hash_id = request_info["hash_id"]
+        user_profile = request_info.get( "user_profile", False )
+        if user_profile:
+            res = requests.get( args.vocallbase_service_address + "/get-audio-user-config-from-hash-id/" + hash_id ).json()
+        else:
+            res = requests.get( args.vocallbase_service_address + "/get-audio-dataset-config-from-hash-id/" + hash_id ).json()
         res = [ res ]
     except:
-        pass
+        res = []
     
     return jsonify(res), 201
+
 
 @app.route("/get-annotations/<hash_id>", methods=['GET'])
 def get_annotations(hash_id):
