@@ -38,7 +38,7 @@ class SpecCalConstantQ:
             self.bins_per_octave = max( self.min_bins_per_octave, bins_per_octave )
         
         self.cmap = matplotlib.colormaps.get_cmap(color_map)
-        self.freqs = cqt_frequencies( self.n_bins, fmin = self.min_frequency, bins_per_octave = self.bins_per_octave)
+        self.freqs = np.round(np.array( cqt_frequencies( self.n_bins, fmin = self.min_frequency, bins_per_octave = self.bins_per_octave) ))
 
     def sigmoid(self, x, offset, low, high, sharpness):
         remapped = (x - offset) * sharpness
@@ -53,7 +53,18 @@ class SpecCalConstantQ:
     
         return y
     
-    def __call__(self, audio ):
+    def min_max_norm(self, im, norm_min_value = None, norm_max_value = None):
+        if norm_min_value is not None and norm_max_value is not None:
+            pseudo_min = norm_min_value
+            pseudo_max = norm_max_value
+        else:
+            pseudo_min = np.percentile(im, 0.01)
+            pseudo_max = np.percentile(im, 99.99)
+    
+        # return (im - im.min()) / max(im.max() - im.min(), 1e-12)
+        return np.clip( (im-pseudo_min) / max( pseudo_max - pseudo_min, 1e-12 ), 0, 1)
+    
+    def __call__(self, audio, norm_min_value = None, norm_max_value = None, return_min_max_spec_values = False ):
         cqt = librosa.cqt(audio,
                   sr=self.sr,
                   hop_length=self.hop_length,
@@ -64,9 +75,14 @@ class SpecCalConstantQ:
                   window='blackmanharris')
 
         cqt_db = librosa.amplitude_to_db(np.abs(cqt))
-        cqt_db_norm = np.copy(cqt_db)
-        cqt_db_norm -= cqt_db_norm.min()
-        cqt_db_norm /= cqt_db_norm.max()
+        # cqt_db_norm = np.copy(cqt_db)
+        # cqt_db_norm -= cqt_db_norm.min()
+        # cqt_db_norm /= cqt_db_norm.max()
+
+        min_spec_values = np.percentile(cqt_db, 0.01)
+        max_spec_values = np.percentile(cqt_db, 99.99)
+
+        cqt_db_norm = self.min_max_norm( cqt_db, norm_min_value, norm_max_value )
         
         result = self.sigmoid(cqt_db_norm, 0.5, 0, 1, 2) # cqt_db_norm
         result = result[:,:-1]
@@ -74,7 +90,10 @@ class SpecCalConstantQ:
         
         spec = np.flip(self.cmap( result )[:,:,:3], axis = 0)
         
-        return spec
+        if return_min_max_spec_values:
+            return spec, min_spec_values, max_spec_values
+        else:
+            return spec
     
 class SpecCalLogMel:
     def __init__(self, sr, hop_length, min_frequency = None, max_frequency = None, n_bins = 256,
@@ -105,7 +124,7 @@ class SpecCalLogMel:
         self.n_fft = n_fft
         self.freq_upsampling_ratio = 8
 
-        self.freqs = mel_frequencies( self.n_bins, fmin = self.min_frequency, fmax = self.max_frequency )
+        self.freqs = np.round(np.array( mel_frequencies( self.n_bins, fmin = self.min_frequency, fmax = self.max_frequency ) ))
 
     def sigmoid(self, x, offset, low, high, sharpness):
         remapped = (x - offset) * sharpness
@@ -120,16 +139,19 @@ class SpecCalLogMel:
 
         return y
     
-    def min_max_norm(self, im):
-        ## This is used to increase the contrast of the image
-        pseudo_min = np.percentile(im, 0.01)
-        pseudo_max = np.percentile(im, 99.99)
+    def min_max_norm(self, im, norm_min_value = None, norm_max_value = None):
+        if norm_min_value is not None and norm_max_value is not None:
+            pseudo_min = norm_min_value
+            pseudo_max = norm_max_value
+        else:
+            pseudo_min = np.percentile(im, 0.01)
+            pseudo_max = np.percentile(im, 99.99)
     
         # return (im - im.min()) / max(im.max() - im.min(), 1e-12)
-        return (im-pseudo_min) / max( pseudo_max - pseudo_min, 1e-12 )
+        return np.clip( (im-pseudo_min) / max( pseudo_max - pseudo_min, 1e-12 ), 0, 1)
     
     
-    def __call__(self, audio ):
+    def __call__(self, audio, norm_min_value = None, norm_max_value = None, return_min_max_spec_values = False ):
         stft_result = librosa.stft( y=audio, hop_length=self.hop_length, n_fft=self.n_fft )[:,:-1]    
         spec = np.abs(stft_result)**2
     
@@ -139,16 +161,22 @@ class SpecCalLogMel:
         pseudo_n_fft = self.n_fft * self.freq_upsampling_ratio
         new_spec = new_spec[ : pseudo_n_fft//2+1 ]
         melfb = librosa.filters.mel(sr=self.sr, n_mels=self.n_bins, n_fft = pseudo_n_fft, fmin=self.min_frequency, fmax = self.max_frequency )
-        mel_spec = np.matmul(melfb, new_spec)
+        mel_spec = np.matmul( melfb, new_spec )
 
-        log_mel_spec = librosa.power_to_db(mel_spec, ref=np.max)
-        log_mel_spec = self.min_max_norm( log_mel_spec )
+        log_mel_spec = librosa.power_to_db( mel_spec, ref=np.max )
+
+        min_spec_values = np.percentile(log_mel_spec, 0.01)
+        max_spec_values = np.percentile(log_mel_spec, 99.99)
+
+        log_mel_spec = self.min_max_norm( log_mel_spec, norm_min_value, norm_max_value )
         
         log_mel_spec = np.flip(self.cmap( log_mel_spec )[:,:,:3], axis = 0)
     
-        return log_mel_spec
+        if return_min_max_spec_values:
+            return log_mel_spec, min_spec_values, max_spec_values
+        else:
+            return log_mel_spec
     
-
 class SpecCalDummy:
     def __init__(self, sr, hop_length, min_frequency = None, max_frequency = None, n_bins = 256,
                  n_fft = None,
@@ -178,7 +206,7 @@ class SpecCalDummy:
         self.n_fft = n_fft
         self.freq_upsampling_ratio = 8
 
-        self.freqs = mel_frequencies( self.n_bins, fmin = self.min_frequency, fmax = self.max_frequency )
+        self.freqs = np.round(np.array( mel_frequencies( self.n_bins, fmin = self.min_frequency, fmax = self.max_frequency ) ))
 
     def sigmoid(self, x, offset, low, high, sharpness):
         remapped = (x - offset) * sharpness
@@ -232,11 +260,15 @@ class SpecCalDummy:
         
         return log_mel_spec        
     
-    def __call__(self, audio, hop_length = None, n_fft = None ):
-        if hop_length is None:
-            hop_length = self.hop_length
-        if n_fft is None:
-            n_fft = min( len(audio), 16000 )
+    # def __call__(self, audio, hop_length = None, n_fft = None ):
+        # if hop_length is None:
+        #     hop_length = self.hop_length
+        # if n_fft is None:
+        #     n_fft = min( len(audio), 16000 )
+
+    def __call__(self, audio, norm_min_value = None, norm_max_value = None, return_min_max_spec_values = False ):
+        hop_length = self.hop_length
+        n_fft = min( len(audio), self.n_fft )
             
         log_mel_spec = self.get_log_mel_spec_uncolored( audio, hop_length, n_fft )
         dummy_spec = self.get_dummy_spec_uncolored( audio, hop_length )
@@ -256,7 +288,9 @@ class SpecCalDummy:
             mask_indices = np.logical_or( mask_indices, np.array(mask_indices[1:].tolist() + [0]))
             inverse_mask_indices = mask_indices == 0
             dummy_spec[mask_indices, onset:offset] = 0
-            # print( self.freqs[inverse_mask_indices][:5], self.freqs[inverse_mask_indices][-5:] )
         color_spec = np.flip(self.cmap( dummy_spec )[:,:,:3], axis = 0)
-        return color_spec
+        if return_min_max_spec_values:
+            return color_spec, None, None
+        else:
+            return color_spec
     

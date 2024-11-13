@@ -152,6 +152,15 @@ def min_max_downsample(array, rough_target_length):
     downsampled_array = downsampled_array.flatten()
     return downsampled_array
 
+def normalize_audio( audio ):
+    if len(audio) == 0:
+        return audio
+    std = np.std(audio)
+    avg = np.mean(audio)
+    normalized_audio = (audio - avg) / (std + 1e-6)
+    return normalized_audio
+
+
 def resample_audio( audio, target_length = 100000 ):
     if len(audio) <= target_length:
         sampled_audio = audio
@@ -484,7 +493,8 @@ def get_audio_clip_for_visualization():
     audio_clip = audio[ int( start_time * sr ):int( (start_time + clip_duration) * sr ) ]
     audio_clip = resample_audio( audio_clip, target_length )
 
-    audio_clip = np.clip( audio_clip, a_min = percentile_down, a_max =  percentile_up )
+    # audio_clip = np.clip( audio_clip, a_min = percentile_down, a_max =  percentile_up )
+    audio_clip = normalize_audio(audio_clip)
     return jsonify({"wav_array":audio_clip.tolist()}), 201
 
 @app.route("/list-models-available-for-finetuning", methods=['POST'])
