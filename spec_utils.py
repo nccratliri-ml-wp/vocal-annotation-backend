@@ -10,6 +10,42 @@ from PIL import Image
 import sys
 from librosa.core.convert import cqt_frequencies, mel_frequencies
 
+
+from PIL import Image, ImageEnhance
+import numpy as np
+
+def adjust_brightness_contrast_grayscale(matrix, brightness=1.0, contrast=1.0):
+    """
+    Adjusts the brightness and contrast of a single-channel (grayscale) 2D matrix.
+    
+    Parameters:
+    - matrix (np.ndarray): A 2D NumPy array representing a grayscale image.
+    - brightness (float): Factor for brightness. 1.0 means no change, less than 1.0 makes it darker,
+                          and greater than 1.0 makes it brighter.
+    - contrast (float): Factor for contrast. 1.0 means no change, less than 1.0 reduces contrast,
+                        and greater than 1.0 increases contrast.
+                        
+    Returns:
+    - np.ndarray: A 2D NumPy array with adjusted brightness and contrast.
+    """
+    matrix = (matrix * 255).astype(np.uint8)
+    # Convert 2D matrix to a grayscale PIL Image
+    img = Image.fromarray(matrix).convert("L")
+    
+    # Adjust brightness
+    enhancer_brightness = ImageEnhance.Brightness(img)
+    img = enhancer_brightness.enhance(brightness)
+    
+    # Adjust contrast
+    enhancer_contrast = ImageEnhance.Contrast(img)
+    img = enhancer_contrast.enhance(contrast)
+    
+    # Convert back to a 2D NumPy array
+    adjusted_matrix = np.array(img) / 255
+    return adjusted_matrix
+
+
+
 class SpecCalConstantQ:
     def __init__(self, sr, hop_length, min_frequency = None, max_frequency = None, n_bins = 256, 
                  bins_per_octave = None,
@@ -53,18 +89,14 @@ class SpecCalConstantQ:
     
         return y
     
-    def min_max_norm(self, im, norm_min_value = None, norm_max_value = None):
-        if norm_min_value is not None and norm_max_value is not None:
-            pseudo_min = norm_min_value
-            pseudo_max = norm_max_value
-        else:
-            pseudo_min = np.percentile(im, 0.01)
-            pseudo_max = np.percentile(im, 99.99)
+    def min_max_norm(self, im):
+        pseudo_min = np.percentile(im, 0.01)
+        pseudo_max = np.percentile(im, 99.99)
     
         # return (im - im.min()) / max(im.max() - im.min(), 1e-12)
         return np.clip( (im-pseudo_min) / max( pseudo_max - pseudo_min, 1e-12 ), 0, 1)
     
-    def __call__(self, audio, norm_min_value = None, norm_max_value = None, return_min_max_spec_values = False ):
+    def __call__(self, audio, brightness=1.0, contrast=1.0 ):
         cqt = librosa.cqt(audio,
                   sr=self.sr,
                   hop_length=self.hop_length,
@@ -79,21 +111,17 @@ class SpecCalConstantQ:
         # cqt_db_norm -= cqt_db_norm.min()
         # cqt_db_norm /= cqt_db_norm.max()
 
-        min_spec_values = np.percentile(cqt_db, 0.01)
-        max_spec_values = np.percentile(cqt_db, 99.99)
-
-        cqt_db_norm = self.min_max_norm( cqt_db, norm_min_value, norm_max_value )
+        cqt_db_norm = self.min_max_norm( cqt_db )
         
         result = self.sigmoid(cqt_db_norm, 0.5, 0, 1, 2) # cqt_db_norm
         result = result[:,:-1]
         result = result.astype(np.float32)
+
+        result = adjust_brightness_contrast_grayscale( result, brightness=brightness, contrast=contrast )
         
         spec = np.flip(self.cmap( result )[:,:,:3], axis = 0)
         
-        if return_min_max_spec_values:
-            return spec, min_spec_values, max_spec_values
-        else:
-            return spec
+        return spec
     
 class SpecCalLogMel:
     def __init__(self, sr, hop_length, min_frequency = None, max_frequency = None, n_bins = 256,
@@ -139,19 +167,15 @@ class SpecCalLogMel:
 
         return y
     
-    def min_max_norm(self, im, norm_min_value = None, norm_max_value = None):
-        if norm_min_value is not None and norm_max_value is not None:
-            pseudo_min = norm_min_value
-            pseudo_max = norm_max_value
-        else:
-            pseudo_min = np.percentile(im, 0.01)
-            pseudo_max = np.percentile(im, 99.99)
+    def min_max_norm(self, im):
+        pseudo_min = np.percentile(im, 0.01)
+        pseudo_max = np.percentile(im, 99.99)
     
         # return (im - im.min()) / max(im.max() - im.min(), 1e-12)
         return np.clip( (im-pseudo_min) / max( pseudo_max - pseudo_min, 1e-12 ), 0, 1)
     
     
-    def __call__(self, audio, norm_min_value = None, norm_max_value = None, return_min_max_spec_values = False ):
+    def __call__(self, audio, brightness=1.0, contrast=1.0 ):
         stft_result = librosa.stft( y=audio, hop_length=self.hop_length, n_fft=self.n_fft )[:,:-1]    
         spec = np.abs(stft_result)**2
     
@@ -165,17 +189,14 @@ class SpecCalLogMel:
 
         log_mel_spec = librosa.power_to_db( mel_spec, ref=np.max )
 
-        min_spec_values = np.percentile(log_mel_spec, 0.01)
-        max_spec_values = np.percentile(log_mel_spec, 99.99)
+        log_mel_spec = self.min_max_norm( log_mel_spec )
+        log_mel_spec = self.sigmoid(log_mel_spec, 0.5, 0, 1, 2) 
 
-        log_mel_spec = self.min_max_norm( log_mel_spec, norm_min_value, norm_max_value )
+        log_mel_spec = adjust_brightness_contrast_grayscale( log_mel_spec, brightness=brightness, contrast=contrast )
         
         log_mel_spec = np.flip(self.cmap( log_mel_spec )[:,:,:3], axis = 0)
     
-        if return_min_max_spec_values:
-            return log_mel_spec, min_spec_values, max_spec_values
-        else:
-            return log_mel_spec
+        return log_mel_spec
     
 class SpecCalDummy:
     def __init__(self, sr, hop_length, min_frequency = None, max_frequency = None, n_bins = 256,
@@ -227,7 +248,7 @@ class SpecCalDummy:
         pseudo_max = np.percentile(im, 99.99)
     
         # return (im - im.min()) / max(im.max() - im.min(), 1e-12)
-        return (im-pseudo_min) / max( pseudo_max - pseudo_min, 1e-12 )
+        return np.clip( (im-pseudo_min) / max( pseudo_max - pseudo_min, 1e-12 ), 0, 1)
     
 
     def get_log_mel_spec_uncolored(self, audio, hop_length, n_fft ):
@@ -266,7 +287,7 @@ class SpecCalDummy:
         # if n_fft is None:
         #     n_fft = min( len(audio), 16000 )
 
-    def __call__(self, audio, norm_min_value = None, norm_max_value = None, return_min_max_spec_values = False ):
+    def __call__(self, audio, brightness=1.0, contrast=1.0 ):
         hop_length = self.hop_length
         n_fft = min( len(audio), self.n_fft )
             
@@ -289,8 +310,6 @@ class SpecCalDummy:
             inverse_mask_indices = mask_indices == 0
             dummy_spec[mask_indices, onset:offset] = 0
         color_spec = np.flip(self.cmap( dummy_spec )[:,:,:3], axis = 0)
-        if return_min_max_spec_values:
-            return color_spec, None, None
-        else:
-            return color_spec
+
+        return color_spec
     

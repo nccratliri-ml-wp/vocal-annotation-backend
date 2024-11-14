@@ -72,7 +72,8 @@ def get_spectrogram( audio, sr, start_time, hop_length,
                      min_frequency = None, max_frequency = None, n_bins = 256,
                      spec_cal_method = None,
                      n_fft = None,
-                     bins_per_octave = None
+                     bins_per_octave = None,
+                     brightness=1.0, contrast=1.0 
                    ):
     if spec_cal_method is None:
         spec_cal_method = "log-mel"
@@ -101,7 +102,7 @@ def get_spectrogram( audio, sr, start_time, hop_length,
     audio_clip = np.concatenate( [ audio_clip, np.zeros( num_samples - len(audio_clip) ) ], axis = 0 )
     audio_clip = audio_clip.astype(np.float32)
         
-    log_mel_spec = spec_cal( audio_clip )
+    log_mel_spec = spec_cal( audio_clip, brightness = brightness, contrast = contrast )
     
     ## resize the log_mel_spec
     log_mel_spec = resize( log_mel_spec, ( n_bins, num_spec_columns, 3 ) )
@@ -116,7 +117,7 @@ def get_spectrogram( audio, sr, start_time, hop_length,
         "min_frequency":spec_cal.min_frequency,
         "max_frequency":spec_cal.max_frequency
     }
-    
+
     return log_mel_spec, spec_cal.freqs, config
 
 def min_max_downsample(array, rough_target_length):
@@ -175,7 +176,7 @@ def resample_audio( audio, target_length = 100000 ):
     final_audio = final_audio.astype(np.float32)
     return final_audio
     
-def register_new_audio( audio, sr, orig_audio, orig_sr, audio_id ): 
+def register_new_audio( audio, sr, orig_audio, orig_sr, audio_id  ): 
     ## "audio" is only used when displaying the spectrogram
     ## "orig_audio" is used for get wavform, and run segmentation
     global audio_dict
@@ -267,9 +268,8 @@ def upload():
         orig_audio = orig_audio_multi_channels[pos]
 
         audio_id = str( uuid4() )
-        register_new_audio( audio, sr, orig_audio, orig_sr, audio_id )
         
-        whole_audio_spec, freqs, config = get_spectrogram( audio, sr, 0, hop_length, 
+        whole_audio_spec, freqs, config  = get_spectrogram( audio, sr, 0, hop_length, 
                                                           num_spec_columns = num_spec_columns, 
                                                           min_frequency = min_frequency, 
                                                           max_frequency = max_frequency,
@@ -278,6 +278,8 @@ def upload():
                                                           n_fft = n_fft,
                                                           bins_per_octave = bins_per_octave
                                                         )
+        
+        register_new_audio( audio, sr, orig_audio, orig_sr, audio_id )
         
         spec_3d_arr = np.asarray(whole_audio_spec)
         spec_3d_arr = np.minimum(spec_3d_arr * 255, 255).astype(np.uint8)
@@ -339,7 +341,6 @@ def upload_by_url():
         orig_audio = orig_audio_multi_channels[pos]
     
         audio_id = str( uuid4() )
-        register_new_audio( audio, sr, orig_audio, orig_sr, audio_id )
         
         whole_audio_spec, freqs, config = get_spectrogram( 
                                                           audio, sr, 0, hop_length, 
@@ -351,6 +352,7 @@ def upload_by_url():
                                                           n_fft = n_fft,
                                                           bins_per_octave = bins_per_octave
                                                         )
+        register_new_audio( audio, sr, orig_audio, orig_sr, audio_id )
         
         spec_3d_arr = np.asarray(whole_audio_spec)
         spec_3d_arr = np.minimum(spec_3d_arr * 255, 255).astype(np.uint8)
@@ -392,13 +394,14 @@ def get_audio_clip_spec():
     sr = request_info['sampling_rate']
     min_frequency = request_info['min_frequency']
     max_frequency = request_info['max_frequency']
+    brightness = request_info.get( "brightness", 1.0) 
+    contrast = request_info.get( "contrast", 1.0) 
     
     audio = audio_dict[audio_id]["audio"]  
 
     ## update the timestamp of the audio_id
     audio_dict[audio_id]["timestamp"] = datetime.now()
-    
-
+        
     if sr is None:
         sr = audio_dict[audio_id]["sr"]
     else:
@@ -424,13 +427,14 @@ def get_audio_clip_spec():
                                                           n_bins = n_bins,
                                                           spec_cal_method = spec_cal_method,
                                                           n_fft = n_fft,
-                                                          bins_per_octave = bins_per_octave
+                                                          bins_per_octave = bins_per_octave,
+                                                          brightness = brightness,
+                                                          contrast = contrast
                                                     )
     
     spec_3d_arr = np.asarray(audio_clip_spec)
     spec_3d_arr = np.minimum(spec_3d_arr * 255, 255).astype(np.uint8)
     im = Image.fromarray(spec_3d_arr)
-
     # Create an in-memory binary stream
     buffer = io.BytesIO()
     # Save the image to the stream
