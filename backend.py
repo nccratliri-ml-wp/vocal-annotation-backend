@@ -73,8 +73,12 @@ def get_spectrogram( audio, sr, start_time, hop_length,
                      spec_cal_method = None,
                      n_fft = None,
                      bins_per_octave = None,
-                     brightness=1.0, contrast=1.0 
+                     brightness=1.0, contrast=1.0,
+                     color_map = "inferno"
                    ):
+    if color_map not in [ 'viridis', 'plasma', 'inferno', 'magma', 'cividis', 'gray' ]:
+        color_map = 'inferno'
+
     if spec_cal_method is None:
         spec_cal_method = "log-mel"
                 
@@ -85,15 +89,15 @@ def get_spectrogram( audio, sr, start_time, hop_length,
     if spec_cal_method == "log-mel":
         spec_cal = SpecCalLogMel( sr = sr, hop_length = hop_length, 
                                   min_frequency = min_frequency, max_frequency = max_frequency,
-                                  n_bins = n_bins, n_fft = n_fft )
+                                  n_bins = n_bins, n_fft = n_fft, color_map = color_map )
     elif spec_cal_method == "constant-q":
         spec_cal = SpecCalConstantQ( sr = sr, hop_length = hop_length, 
                                   min_frequency = min_frequency, max_frequency = max_frequency,
-                                  n_bins = n_bins, bins_per_octave = bins_per_octave )
+                                  n_bins = n_bins, bins_per_octave = bins_per_octave,  color_map = color_map )
     elif spec_cal_method == "dummy":
         spec_cal = SpecCalDummy( sr = sr, hop_length = hop_length, 
                                   min_frequency = min_frequency, max_frequency = max_frequency,
-                                  n_bins = n_bins, n_fft = n_fft )
+                                  n_bins = n_bins, n_fft = n_fft,  color_map = color_map )
     else:
         assert False, "Unsupported spectrogram computation method!"
     
@@ -235,7 +239,9 @@ def upload():
     sr = request.form.get('sampling_rate', type=int, default=None)
     min_frequency = request.form.get('min_frequency', type=int, default=None)
     max_frequency = request.form.get('max_frequency', type=int, default=None)
+    color_map = request.form.get('color_map', type=str, default="inferno")
     
+
     if num_spec_columns is None:
         num_spec_columns = 1000
 
@@ -276,7 +282,8 @@ def upload():
                                                           n_bins = n_bins,
                                                           spec_cal_method = spec_cal_method,
                                                           n_fft = n_fft,
-                                                          bins_per_octave = bins_per_octave
+                                                          bins_per_octave = bins_per_octave,
+                                                          color_map = color_map
                                                         )
         
         register_new_audio( audio, sr, orig_audio, orig_sr, audio_id )
@@ -317,6 +324,7 @@ def upload_by_url():
     sr = request_info.get('sampling_rate', None)
     min_frequency = request_info.get('min_frequency', None)
     max_frequency = request_info.get('max_frequency', None)
+    color_map = request_info.get('color_map', "inferno")
 
     if num_spec_columns is None:
         num_spec_columns = 1000
@@ -350,7 +358,8 @@ def upload_by_url():
                                                           n_bins = n_bins,
                                                           spec_cal_method = spec_cal_method,
                                                           n_fft = n_fft,
-                                                          bins_per_octave = bins_per_octave
+                                                          bins_per_octave = bins_per_octave,
+                                                          color_map = color_map
                                                         )
         register_new_audio( audio, sr, orig_audio, orig_sr, audio_id )
         
@@ -396,6 +405,7 @@ def get_audio_clip_spec():
     max_frequency = request_info['max_frequency']
     brightness = request_info.get( "brightness", 1.0) 
     contrast = request_info.get( "contrast", 1.0) 
+    color_map = request_info.get('color_map', "inferno")
     
     audio = audio_dict[audio_id]["audio"]  
 
@@ -429,7 +439,8 @@ def get_audio_clip_spec():
                                                           n_fft = n_fft,
                                                           bins_per_octave = bins_per_octave,
                                                           brightness = brightness,
-                                                          contrast = contrast
+                                                          contrast = contrast,
+                                                          color_map = color_map
                                                     )
     
     spec_3d_arr = np.asarray(audio_clip_spec)
