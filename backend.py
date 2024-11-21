@@ -2,6 +2,7 @@ import argparse
 import json
 from flask import Flask, jsonify, abort, make_response, request, Response, send_file
 from flask_cors import CORS
+import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.cm as cm
 import librosa
@@ -225,6 +226,59 @@ def parse_clustername( cluster, cluster_separator ):
             "clustername": cluster # "Unknown"
         }
     return parsed_res
+
+"""Example timestamps for plotting
+timestamps = ['2024-11-20 16:42:14.241', 
+              '2024-11-20 16:42:14.880', 
+              '2024-11-20 16:43:15.391', 
+              '2024-11-20 16:43:16.546', 
+              '2024-11-20 16:50:17.535', 
+              '2024-11-20 16:50:19.173', 
+              '2024-11-20 16:50:28.419', 
+              '2024-11-20 16:51:30.223', 
+              '2024-11-20 16:52:31.626', 
+              '2024-11-20 16:52:32.200', 
+              '2024-11-20 16:58:34.332', 
+              '2024-11-20 16:59:34.922', 
+              '2024-11-20 16:59:39.400', 
+              '2024-11-20 16:59:40.857', 
+              '2024-11-20 16:59:42.629']
+
+"""
+def get_estimated_annotation_time(timestamps, idle_thres = 300 ):
+    timestamps = [ datetime.strptime(t, "%Y-%m-%d %H:%M:%S.%f") for t in timestamps]
+    timestamps = sorted(timestamps)
+    if len(timestamps) <2:
+        return 0
+    
+    time_delta_list = [0]
+    for pos in range(len(timestamps) - 1):
+        time_delta_list.append( (timestamps[pos + 1] - timestamps[pos]).total_seconds() )
+    
+    total_time = 0
+    for dt in time_delta_list:
+        if dt <= idle_thres:
+            total_time += dt
+    
+    return total_time
+
+def plot_timestamp_vs_annotation_action( timestamps ):
+    timestamps = [ datetime.strptime(t, "%Y-%m-%d %H:%M:%S.%f") for t in timestamps]
+    timestamps = sorted(timestamps)
+    if len(timestamps) <2:
+        return 
+    
+    timestamps = [ (t - timestamps[0]).total_seconds() for t in timestamps ]
+    plt.plot( timestamps)
+    plt.xticks(range(len(timestamps))) 
+    plt.xlabel("Annotation actions")
+    plt.ylabel("Timestamps (s)")
+    plt.show()
+
+
+@app.route("/get-status", methods=['GET'])
+def get_status():
+    return jsonify({"response":"success"}), 201
     
 @app.route("/upload", methods=['POST'])
 def upload():
@@ -703,6 +757,7 @@ def get_annotations(hash_id):
 @app.route("/post-annotations/<hash_id>", methods=['POST'])
 def post_annotations(hash_id):
     global args
+
     res = requests.post(
         args.vocallbase_service_address + f"/annotations/{hash_id}/",
         data = json.dumps(request.json),
@@ -710,6 +765,7 @@ def post_annotations(hash_id):
                     "accept":"application/json"
                   }
     )
+
     status_code = res.status_code
     if status_code == 200 or status_code == 201:
         status_code = 201
@@ -738,6 +794,53 @@ def release_audio_given_ids():
     
     return jsonify({"status":"success"}), 201
 
+
+@app.route("/estimate-annotation-time", methods=['POST'])
+def estimate_annotation_time():
+    request_info = request.json
+    timestamps = request_info["timestamps"]
+    idle_thres = request_info.get("idle_thres", 300)  ## setting the default idle threshold as 5 min
+    anno_time = get_estimated_annotation_time(timestamps, idle_thres = idle_thres )
+    return jsonify({"response":anno_time}), 201
+
+
+@app.route("/get-annotation-time/<hash_id>", methods=['GET'])
+def get_annotation_time(hash_id):
+    global args
+    try:
+        res = requests.get(f"{args.vocallbase_service_address}/annotation-time/{hash_id}").json()
+        res["annotationTime"] = float(res["annotationTime"])
+    except:
+        res = { "annotationTime":0 }
+    
+    return jsonify(res), 201 
+
+
+@app.route("/post-annotation-time/<hash_id>", methods=['POST'])
+def post_annotation_time(hash_id):
+    global args
+
+    print("submitted data:", request.json)
+
+    res = requests.post(
+        args.vocallbase_service_address + f"/annotation-time/{hash_id}/",
+        data = json.dumps(request.json),
+        headers = { "Content-Type":"application/json",
+                    "accept":"application/json"
+                  }
+    )
+
+    status_code = res.status_code
+    if status_code == 200 or status_code == 201:
+        status_code = 201
+    else:
+        status_code = 400
+    try:
+        response = res.json()
+    except:
+        response = {"Warning:":"No response from posting annotation time"}
+        
+    return jsonify(response), status_code
 
 
 if __name__ == '__main__':
