@@ -804,14 +804,11 @@ def estimate_annotation_time():
     return jsonify({"response":anno_time}), 201
 
 
-@app.route("/annotations/annotation-time/<hash_id>", methods=['POST'])
-def post_annotation_time(hash_id):
+@app.route("/annotation/annotation-time/", methods=['POST'])
+def post_annotation_time():
     global args
-
-    print("submitted data:", request.json)
-
     res = requests.post(
-        args.vocallbase_service_address + f"/annotations/annotation-time/{hash_id}/",
+        args.vocallbase_service_address + f"/annotation/annotation-time/",
         data = json.dumps(request.json),
         headers = { "Content-Type":"application/json",
                     "accept":"application/json"
