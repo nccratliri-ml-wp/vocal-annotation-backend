@@ -25,6 +25,18 @@ Install via environment.yml file
 conda env create -f environment.yml
 ```
 
+# Set up config.yaml to user WhisperSeg
+In the main folder, create a config.yaml file with the user authentication information. Example:
+```yaml
+users:
+  123456789101:
+    username: admin
+    info: ""
+    inference: true
+    train: true
+    is_admin: true
+```
+
 # Start service
 Activate the anaconda environment "audio_backend":
 ```bash
