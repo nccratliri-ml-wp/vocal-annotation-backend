@@ -7,3 +7,5 @@ scikit-image
 pydub
 pandas
 numpy==1.26.4
+toml
+PyYAML

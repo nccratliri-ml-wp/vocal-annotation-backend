@@ -27,6 +27,7 @@ from segmentation_utils import *
 import re
 import zipfile
 from urllib.parse import quote
+import yaml
 
 # Make Flask application
 app = Flask(__name__)
@@ -566,23 +567,82 @@ def get_audio_clip_for_visualization():
     audio_clip = normalize_audio(audio_clip)
     return jsonify({"wav_array":audio_clip.tolist()}), 201
 
+@app.route("/whisperseg-auth", methods=['POST'])
+def whisperseg_auth():
+    global args    
+    request_info = request.json
+    token = request_info.get("token", "")
+    
+    all_authorized_users = yaml.safe_load(open(CONFIG_FILE))["users"]
+    is_success = token in all_authorized_users
+    return jsonify({"success":is_success}), 201
+
 @app.route("/list-models-available-for-finetuning", methods=['POST'])
 def list_models_available_for_finetuning():
     global args    
-    res = requests.post( args.segmentation_service_address + "/list-models-available-for-finetuning" ).json()
-    return jsonify(res), 201
+    request_info = request.json
+    token = request_info.get("token", "")
+    
+    config_data = yaml.safe_load(open(CONFIG_FILE))
+    all_authorized_users = config_data["users"]
+    if token not in all_authorized_users or not all_authorized_users[token]["train"]:
+        return jsonify({"response":[]}), 201
+
+    models = requests.post( args.segmentation_service_address + "/list-models-available-for-finetuning" ).json()["response"]
+    if not all_authorized_users[token].get("is_admin", False):
+        new_models = []
+        for model in models:
+            if model["model_name"] in [ "whisperseg-base", "whisperseg-large" ]:
+                new_models.append(model)
+            elif model["model_name"].startswith(token+"_"):
+                model["model_name"] = model["model_name"][len(token+"_"):]
+                new_models.append(model)
+        models = new_models
+    return jsonify({"response":models}), 201
 
 @app.route("/list-models-available-for-inference", methods=['POST'])
 def list_models_available_for_inference():
     global args    
-    res = requests.post( args.segmentation_service_address + "/list-models-available-for-inference" ).json()
-    return jsonify(res), 201
+    request_info = request.json
+    token = request_info.get("token", "")
+
+    config_data = yaml.safe_load(open(CONFIG_FILE))
+    all_authorized_users = config_data["users"]
+    if token not in all_authorized_users or not all_authorized_users[token]["inference"]:
+        return jsonify({"response":[]}), 201
+    
+    models = requests.post( args.segmentation_service_address + "/list-models-available-for-inference" ).json()["response"]
+    if not all_authorized_users[token].get("is_admin", False):
+        new_models = []
+        for model in models:
+            if model["model_name"] in [ "whisperseg-base", "whisperseg-large" ]:
+                new_models.append(model)
+            elif model["model_name"].startswith(token+"_"):
+                model["model_name"] = model["model_name"][len(token+"_"):]
+                new_models.append(model)
+        models = new_models
+    return jsonify({"response":models}), 201
 
 @app.route("/list-models-training-in-progress", methods=['POST'])
 def list_models_being_trained():
     global args    
-    res = requests.post( args.segmentation_service_address + "/list-models-training-in-progress" ).json()
-    return jsonify(res), 201
+    request_info = request.json
+    token = request_info.get("token", "")
+    
+    config_data = yaml.safe_load(open(CONFIG_FILE))
+    all_authorized_users = config_data["users"]
+    if token not in all_authorized_users or not all_authorized_users[token]["train"]:
+        return jsonify({"response":[]}), 201
+
+    models = requests.post( args.segmentation_service_address + "/list-models-training-in-progress" ).json()["response"]
+    if not all_authorized_users[token].get("is_admin", False):
+        new_models = []
+        for model in models:
+            if model["model_name"].startswith(token+"_"):
+                model["model_name"] = model["model_name"][len(token+"_"):]
+                new_models.append(model)
+        models = new_models
+    return jsonify({"response":models}), 201
 
 @app.route("/get-labels", methods=['POST'])
 def get_labels():
@@ -599,15 +659,22 @@ def get_labels():
     """
     Perform authorization HERE:
     """
-    if token not in ["","123"]:
+    config_data = yaml.safe_load(open(CONFIG_FILE))
+    all_authorized_users = config_data["users"]
+    if token not in all_authorized_users or not all_authorized_users[token]["inference"]:
         return jsonify( {"error":"unauthorized"} ), 403
+
+    ## update model_name with token prefix 
+    ## only for non-admin users. For admin user, just use the model name as it is
+    if not all_authorized_users[token].get("is_admin", False):
+        if model_name not in ["whisperseg-base", "whisperseg-large"]:
+            model_name = token + "_" + model_name
         
-    
     ## update the timestamp of the audio_id
     audio_dict[audio_id]["timestamp"] = datetime.now()
     audio = audio_dict[audio_id]["orig_audio"]
     sr = audio_dict[audio_id]["orig_sr"]
-    
+
     prediction = segment_audio( args.segmentation_service_address, model_name, audio, sr, min_frequency = min_frequency, spec_time_step = None )
     for item in prediction:
         item.update( parse_clustername( item["cluster"], cluster_separator ) )
@@ -659,9 +726,17 @@ def finetune_whisperseg():
     """
     Perform authorization HERE:
     """
-    if token not in ["","123"]:
+    config_data = yaml.safe_load(open(CONFIG_FILE))
+    all_authorized_users = config_data["users"]
+    if token not in all_authorized_users or not all_authorized_users[token]["train"]:
         return jsonify( {"error":"unauthorized"} ), 403
-    
+
+    ## update model_name with token prefix
+    ## only for non-admin users. For admin user, just use the model name as it is
+    if not all_authorized_users[token].get("is_admin", False):
+        new_model_name = token + "_" + new_model_name
+        if initial_model_name not in ["whisperseg-base", "whisperseg-large"]:
+            initial_model_name = token + "_" + initial_model_name
     
     ## update the timestamp of the audio_id
     audio_dict[audio_id]["timestamp"] = datetime.now()
@@ -835,6 +910,7 @@ if __name__ == '__main__':
     parser.add_argument("-vocallbase_service_address", help="The address to the dataplatform evolving language.")
     args = parser.parse_args()
     
+    CONFIG_FILE = "config.yaml"
     audio_dict = {}
     num_spec_columns = 1000
     n_bins = 300
