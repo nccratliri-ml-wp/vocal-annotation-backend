@@ -906,8 +906,8 @@ def post_annotation_time():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-flask_port", help="The port of the flask app.", default=8050, type=int)
-    parser.add_argument("-segmentation_service_address", help="The address to the WhisperSeg segmentation API.")
-    parser.add_argument("-vocallbase_service_address", help="The address to the dataplatform evolving language.")
+    parser.add_argument("-segmentation_service_address", default="", help="The address to the WhisperSeg segmentation API.")
+    parser.add_argument("-vocallbase_service_address", default="", help="The address to the dataplatform evolving language.")
     args = parser.parse_args()
     
     CONFIG_FILE = "config.yaml"

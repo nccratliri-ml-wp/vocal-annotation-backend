@@ -1,6 +1,4 @@
 # Installation of environment
-## Method 1
-Install via pip:
 Create an Anaconda environment
 ```bash
 conda create -n audio_backend python=3.10
@@ -19,13 +17,7 @@ Install dependices via pip
 pip install -r requirements.txt
 ```
 
-## Method 2
-Install via environment.yml file
-```bash
-conda env create -f environment.yml
-```
-
-# Set up config.yaml to user WhisperSeg
+# Set up config.yaml to user WhisperSeg (only needed if you want to use WhisperSeg)
 In the main folder, create a config.yaml file with the user authentication information. Example:
 ```yaml
 users:
